@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysAccountDetailMapper">
+    
+    <resultMap type="SysAccountDetail" id="AccountDetailResult">
+        <result property="leverId"    column="lever_id"    />
+        <result property="price"    column="price"    />
+        <result property="accountNum"    column="account_num"    />
+        <result property="sendGroupMessage"    column="send_group_message"    />
+        <result property="addGroup"    column="add_group"    />
+        <result property="privateSendMessage"    column="private_send_message"    />
+        <result property="findNearbyPeople"    column="find_nearby_people"    />
+        <result property="pullPeopleJoinGroup"    column="pull_people_join_group"    />
+        <result property="autoReplayMessage"    column="auto_replay_message"    />
+        <result property="privateDevice"    column="private_device"    />
+        <result property="vipType"    column="vip_type"    />
+        <result property="forwardMessage"    column="forward_message"    />
+    </resultMap>
+
+    <sql id="selectAccountDetailVo">
+        select lever_id, price, account_num, send_group_message, add_group, private_send_message, find_nearby_people, pull_people_join_group, auto_replay_message, private_device,vip_type,forward_message from account_detail
+    </sql>
+
+    <select id="selectAccountDetailList" parameterType="SysAccountDetail" resultMap="AccountDetailResult">
+        <include refid="selectAccountDetailVo"/>
+        <where>  
+            <if test="price != null "> and price = #{price}</if>
+            <if test="accountNum != null "> and account_num = #{accountNum}</if>
+            <if test="sendGroupMessage != null "> and send_group_message = #{sendGroupMessage}</if>
+            <if test="addGroup != null "> and add_group = #{addGroup}</if>
+            <if test="privateSendMessage != null "> and private_send_message = #{privateSendMessage}</if>
+            <if test="findNearbyPeople != null "> and find_nearby_people = #{findNearbyPeople}</if>
+            <if test="pullPeopleJoinGroup != null "> and pull_people_join_group = #{pullPeopleJoinGroup}</if>
+            <if test="autoReplayMessage != null "> and auto_replay_message = #{autoReplayMessage}</if>
+            <if test="privateDevice != null "> and private_device = #{privateDevice}</if>
+            <if test="forwardMessage != null "> and private_device = #{forward_message}</if>
+            <if test="vipType != null "> and vip_Type = #{vipType}</if>
+
+
+        </where>
+    </select>
+    
+    <select id="selectAccountDetailByLeverId" parameterType="Long" resultMap="AccountDetailResult">
+        <include refid="selectAccountDetailVo"/>
+        where lever_id = #{leverId}
+    </select>
+        
+    <insert id="insertAccountDetail" parameterType="SysAccountDetail" useGeneratedKeys="true" keyProperty="leverId">
+        insert into account_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="price != null">price,</if>
+            <if test="accountNum != null">account_num,</if>
+            <if test="sendGroupMessage != null">send_group_message,</if>
+            <if test="addGroup != null">add_group,</if>
+            <if test="privateSendMessage != null">private_send_message,</if>
+            <if test="findNearbyPeople != null">find_nearby_people,</if>
+            <if test="pullPeopleJoinGroup != null">pull_people_join_group,</if>
+            <if test="autoReplayMessage != null">auto_replay_message,</if>
+            <if test="privateDevice != null">private_device,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="price != null">#{price},</if>
+            <if test="accountNum != null">#{accountNum},</if>
+            <if test="sendGroupMessage != null">#{sendGroupMessage},</if>
+            <if test="addGroup != null">#{addGroup},</if>
+            <if test="privateSendMessage != null">#{privateSendMessage},</if>
+            <if test="findNearbyPeople != null">#{findNearbyPeople},</if>
+            <if test="pullPeopleJoinGroup != null">#{pullPeopleJoinGroup},</if>
+            <if test="autoReplayMessage != null">#{autoReplayMessage},</if>
+            <if test="privateDevice != null">#{privateDevice},</if>
+         </trim>
+    </insert>
+
+    <update id="updateAccountDetail" parameterType="SysAccountDetail">
+        update account_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="price != null">price = #{price},</if>
+            <if test="accountNum != null">account_num = #{accountNum},</if>
+            <if test="sendGroupMessage != null">send_group_message = #{sendGroupMessage},</if>
+            <if test="addGroup != null">add_group = #{addGroup},</if>
+            <if test="privateSendMessage != null">private_send_message = #{privateSendMessage},</if>
+            <if test="findNearbyPeople != null">find_nearby_people = #{findNearbyPeople},</if>
+            <if test="pullPeopleJoinGroup != null">pull_people_join_group = #{pullPeopleJoinGroup},</if>
+            <if test="autoReplayMessage != null">auto_replay_message = #{autoReplayMessage},</if>
+            <if test="privateDevice != null">private_device = #{privateDevice},</if>
+        </trim>
+        where lever_id = #{leverId}
+    </update>
+
+    <delete id="deleteAccountDetailByLeverId" parameterType="Long">
+        delete from account_detail where lever_id = #{leverId}
+    </delete>
+
+    <delete id="deleteAccountDetailByLeverIds" parameterType="String">
+        delete from account_detail where lever_id in 
+        <foreach item="leverId" collection="array" open="(" separator="," close=")">
+            #{leverId}
+        </foreach>
+    </delete>
+</mapper>
