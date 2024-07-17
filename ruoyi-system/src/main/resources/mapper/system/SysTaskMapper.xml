@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysTaskMapper">
+
+    <resultMap type="MyJob" id="SysTaskResult">
+        <result property="jobId"    column="job_id"    />
+        <result property="sysAccountName"    column="sys_account_name"    />
+        <result property="jobName"    column="job_name"    />
+        <result property="jobType"    column="job_type"    />
+        <result property="tarNum"    column="tar_num"    />
+        <result property="successNum"    column="succes_num"    />
+        <result property="intervals"    column="intervals"    />
+        <result property="intervalsUnit"    column="intervals_unit"    />
+        <result property="intervalLoop"    column="loop_interval"    />
+        <result property="intervalLoopUnit"    column="loop_interval_unit"    />
+        <result property="parms"    column="parms"    />
+        <result property="jobGroup"    column="job_group"    />
+        <result property="jobClass"    column="job_class"    />
+        <result property="jobStatus"    column="job_status"    />
+        <result property="planDate"    column="job_plan_date"    />
+        <result property="loopEnd"    column="loop_end"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="userId"    column="sys_user_id"    />
+
+    </resultMap>
+
+    <resultMap type="MyJobDetail" id="SysTaskDetailResult">
+        <result property="jobDetailId"    column="my_job_detail_id"    />
+        <result property="jobDetailStatus"    column="my_job_detail_status"    />
+        <result property="msg"    column="my_job_detail_msg"    />
+        <result property="jobDetailDate"    column="my_job_detail_date"    />
+        <result property="jobId"    column="my_job_id"    />
+        <result property="targ"    column="my_job_detail_targ"    />
+        <result property="taskClass"    column="my_job_detail_task_class"    />
+        <result property="index"    column="my_job_detail_index"    />
+        <result property="targId"    column="my_job_detail_targ_id"    />
+
+    </resultMap>
+
+
+    <sql id="selectSysTaskVo">
+        select job_id,sys_account_name,job_name,job_type,tar_num,succes_num,intervals,loop_interval,parms,job_group,job_class,job_status,create_date,loop_interval_unit,intervals_unit,sys_user_id,job_plan_date,loop_end FROM my_job
+    </sql>
+
+    <select id="selectSysTaskList" parameterType="Myjob" resultMap="SysTaskResult">
+        <include refid="selectSysTaskVo"/>
+        <where>
+            <if test="userId != null "> and sys_user_id = #{userId}</if>
+            <if test="sysAccountName != null "> and sys_account_name like concat('%', #{sysAccountName}, '%')</if>
+            <if test="jobName != null "> and job_name = #{jobName}</if>
+            <if test="jobStatus != null "> and job_status = #{jobStatus}</if>
+            <if test="jobType != null "> and job_type = #{jobType}</if>
+        </where>
+    </select>
+
+    <select id="selectTaskListByStatus"  resultMap="SysTaskResult">
+        <include refid="selectSysTaskVo"/>
+        where  job_status =1  or job_status=2 or (job_type=2 and loop_end=0 and job_status!=0)
+    </select>
+
+    <select id="selectSysTaskDetailList" parameterType="Long" resultMap="SysTaskDetailResult">
+        select * from my_job_detail where my_job_id=#{jobId} and  my_job_detail_status >= 0
+    </select>
+
+    <delete id="deleteByJobId">
+        delete FROM my_job_detail a WHERE a.my_job_id =#{jobId}
+    </delete>
+
+
+    <delete id="BatchDeleteJobByJobId">
+        delete from my_job where job_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="BatchDeleteJobDetailByJobId">
+        delete from my_job_detail where my_job_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+
+    <select id="selectSysTaskDetailListOrderByIndex" parameterType="Long" resultMap="SysTaskDetailResult">
+        select  * from my_job_detail a where my_job_detail_status =-1 or my_job_detail_status =-2  ORDER  BY my_job_detail_index LIMIT 0,1
+    </select>
+
+</mapper>

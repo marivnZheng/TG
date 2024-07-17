@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysContactMapper">
+
+    <resultMap type="SysContact" id="SysContactResult">
+        <result property="sysContactId"    column="sys_contact_id"    />
+        <result property="sysAccountId"    column="sys_account_id"    />
+        <result property="sysUserId"    column="sys_user_id"    />
+        <result property="sysContactName"    column="sys_contact_name"    />
+        <result property="sysContactUserName"    column="sys_contact_user_name"    />
+        <result property="sysMutualContact"    column="sys_mutual_contact"    />
+        <result property="sysStatus"    column="sys_status"    />
+        <result property="sysContactPhone"    column="sys_contact_phone"    />
+    </resultMap>
+
+    <sql id="selectSysContactVo">
+        select sys_contact_id, sys_account_id, sys_user_id, sys_contact_name, sys_contact_user_name, sys_mutual_contact, sys_status,sys_contact_phone from sys_contact
+    </sql>
+
+    <select id="selectSysContactList" parameterType="SysContact" resultMap="SysContactResult">
+        <include refid="selectSysContactVo"/>
+        <where>
+            <if test="sysAccountId != null "> and sys_account_id = #{sysAccountId}</if>
+            <if test="sysUserId != null "> and sys_user_id = #{sysUserId}</if>
+            <if test="sysContactName != null"> and sys_contact_name like concat('%', #{sysContactName}, '%')</if>
+            <if test="sysContactPhone != null"> and sys_contact_phone like concat('%', #{sysContactPhone}, '%')</if>
+            <if test="sysContactUserName != null"> and sys_contact_user_name like concat('%', #{sysContactUserName}, '%')</if>
+            <if test="sysMutualContact != null "> and sys_mutual_contact = #{sysMutualContact}</if>
+            <if test="sysStatus != null "> and sys_status = #{sysStatus}</if>
+        </where>
+    </select>
+
+    <select id="selectSysContactBySysContactId" parameterType="Long" resultMap="SysContactResult">
+        <include refid="selectSysContactVo"/>
+        where sys_contact_id = #{sysContactId}
+    </select>
+
+    <select id="selectSysContactBySysAccount" parameterType="Long" resultMap="SysContactResult">
+        <include refid="selectSysContactVo"/>
+        where sys_account_id = #{accountId}
+    </select>
+
+    <update  id="insertSysContact" parameterType="SysContact">
+        insert into sys_contact
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sysContactId != null">sys_contact_id,</if>
+            <if test="sysAccountId != null">sys_account_id,</if>
+            <if test="sysUserId != null">sys_user_id,</if>
+            <if test="sysContactName != null">sys_contact_name,</if>
+            <if test="sysContactUserName != null">sys_contact_user_name,</if>
+            <if test="sysMutualContact != null">sys_mutual_contact,</if>
+            <if test="sysStatus != null">sys_status,</if>
+            <if test="sysContactPhone != null">sys_contact_phone,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sysContactId != null">#{sysContactId},</if>
+            <if test="sysAccountId != null">#{sysAccountId},</if>
+            <if test="sysUserId != null">#{sysUserId},</if>
+            <if test="sysContactName != null">#{sysContactName},</if>
+            <if test="sysContactUserName != null">#{sysContactUserName},</if>
+            <if test="sysMutualContact != null">#{sysMutualContact},</if>
+            <if test="sysStatus != null">#{sysStatus},</if>
+            <if test="sysContactPhone != null">#{sysContactPhone},</if>
+        </trim>
+        on duplicate key update sys_account_id =#{sysAccountId},sys_account_id=#{sysAccountId},sys_user_id=#{sysUserId},sys_contact_name=#{sysContactName},
+        sys_mutual_contact=#{sysMutualContact},sys_status=#{sysStatus},sys_contact_phone=#{sysContactPhone}
+
+    </update >
+
+    <update id="updateSysContact" parameterType="SysContact">
+        update sys_contact
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sysAccountId != null">sys_account_id = #{sysAccountId},</if>
+            <if test="sysUserId != null">sys_user_id = #{sysUserId},</if>
+            <if test="sysContactName != null">sys_contact_name = #{sysContactName},</if>
+            <if test="sysContactUserName != null">sys_contact_user_name = #{sysContactUserName},</if>
+            <if test="sysMutualContact != null">sys_mutual_contact = #{sysMutualContact},</if>
+            <if test="sysStatus != null">sys_status = #{sysStatus},</if>
+        </trim>
+        where sys_contact_id = #{sysContactId}
+    </update>
+
+    <delete id="deleteSysContactBySysContactId" parameterType="Long">
+        delete from sys_contact where sys_contact_id = #{sysContactId}
+    </delete>
+
+    <delete id="deleteSysContactBySysContactIds" parameterType="String">
+        delete from sys_contact where sys_contact_id in
+        <foreach item="sysContactId" collection="array" open="(" separator="," close=")">
+            #{sysContactId}
+        </foreach>
+    </delete>
+</mapper>

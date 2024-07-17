@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysAccountMapper">
+
+    <resultMap type="SysAccount" id="SysAccountResult">
+        <result property="sysAccountId"    column="sys_account_id"    />
+        <result property="sysUserId"    column="sys_user_id"    />
+        <result property="sysAccountName"    column="sys_account_name"    />
+        <result property="sysAccountPhone"    column="sys_account_phone"    />
+        <result property="sysAccountSessionFile"    column="sys_account_session_file"    />
+        <result property="sysAccountStringSession"    column="sys_account_string_session"    />
+        <result property="sysAccountConcatsNumber"    column="sys_account_concats_number"    />
+        <result property="sysAccountGroupNumber"    column="sys_account_group_number"    />
+        <result property="sysAccountCreateTime"    column="sys_account_create_time"    />
+        <result property="sysAccountCreateTimezone"    column="sys_account_create_timeZone"    />
+        <result property="sysAccountLastName"    column="sys_account_last_name"    />
+        <result property="sysAccountFirstName"    column="sys_account_first_name"    />
+        <result property="sysAccountAbout"    column="sys_account_about"    />
+        <result property="sysAccountOnline"    column="sys_account_Online"    />
+        <result property="sysAccountLoginStatus"    column="sys_account_login_status"    />
+    </resultMap>
+
+    <sql id="selectSysAccountVo">
+        select sys_account_id, sys_user_id, sys_account_name, sys_account_phone, sys_account_session_file, sys_account_string_session, sys_account_concats_number, sys_account_group_number, sys_account_create_time, sys_account_create_timeZone,sys_account_last_name,sys_account_first_name,sys_account_about,sys_account_online,sys_account_login_status from sys_account
+    </sql>
+
+    <select id="selectSysAccountList" parameterType="SysAccount" resultMap="SysAccountResult">
+        <include refid="selectSysAccountVo"/>
+        <where>
+            <if test="sysUserId != null "> and sys_user_id = #{sysUserId}</if>
+            <if test="sysAccountName != null  and sysAccountName != ''"> and sys_account_name like concat('%', #{sysAccountName}, '%')</if>
+            <if test="sysAccountPhone != null  and sysAccountPhone != ''"> and sys_account_phone like concat('%', #{sysAccountPhone}, '%')</if>
+            <if test="sysAccountSessionFile != null  and sysAccountSessionFile != ''"> and sys_account_session_file = #{sysAccountSessionFile}</if>
+            <if test="sysAccountStringSession != null  and sysAccountStringSession != ''"> and sys_account_string_session = #{sysAccountStringSession}</if>
+            <if test="sysAccountConcatsNumber != null "> and sys_account_concats_number = #{sysAccountConcatsNumber}</if>
+            <if test="sysAccountGroupNumber != null "> and sys_account_group_number = #{sysAccountGroupNumber}</if>
+            <if test="sysAccountCreateTime != null "> and sys_account_create_time = #{sysAccountCreateTime}</if>
+            <if test="sysAccountCreateTimezone != null  and sysAccountCreateTimezone != ''"> and sys_account_create_timeZone = #{sysAccountCreateTimezone}</if>
+            <if test="sysAccountAbout != null">and sys_account_about = #{sysAccountAbout}</if>
+            <if test="sysAccountFirstName != null and sysAccountLastName != null">and (sys_account_first_name like concat('%', #{sysAccountFirstName}, '%') or sys_account_last_name like concat('%', #{sysAccountLastName}, '%'))</if>
+            <if test="sysAccountOnline != null">and sys_account_online = #{sysAccountOnline}</if>
+        </where>
+    </select>
+
+    <select id="selectListOnline" parameterType="SysAccount" resultMap="SysAccountResult">
+        <include refid="selectSysAccountVo"/>
+        <where>
+            sys_account_online='0' AND sys_account_login_status='0'
+            <if test="sysUserId!=null"> and sys_user_id = #{sysUserId}</if>
+        </where>
+    </select>
+
+    <select id="selectCountUserId">
+        select count(1) from  sys_account
+        <where>
+            <if test="sysUserId!=null"> and sys_user_id = #{sysUserId}</if>
+        </where>
+    </select>
+
+    <select id="selectSysAccountBySysAccountId" parameterType="Long" resultMap="SysAccountResult">
+        <include refid="selectSysAccountVo"/>
+        where sys_account_id = #{sysAccountId}
+    </select>
+
+    <insert id="insertSysAccount" parameterType="SysAccount" useGeneratedKeys="true" keyProperty="sysAccountId">
+        insert into sys_account
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sysUserId != null">sys_user_id,</if>
+            <if test="sysAccountName != null">sys_account_name,</if>
+            <if test="sysAccountPhone != null">sys_account_phone,</if>
+            <if test="sysAccountSessionFile != null">sys_account_session_file,</if>
+            <if test="sysAccountStringSession != null">sys_account_string_session,</if>
+            <if test="sysAccountConcatsNumber != null">sys_account_concats_number,</if>
+            <if test="sysAccountGroupNumber != null">sys_account_group_number,</if>
+            <if test="sysAccountCreateTime != null">sys_account_create_time,</if>
+            <if test="sysAccountCreateTimezone != null">sys_account_create_timeZone,</if>
+            <if test="sysAccountFirstName != null">sys_account_first_name,</if>
+            <if test="sysAccountLastName != null">sys_account_last_name,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sysUserId != null">#{sysUserId},</if>
+            <if test="sysAccountName != null">#{sysAccountName},</if>
+            <if test="sysAccountPhone != null">#{sysAccountPhone},</if>
+            <if test="sysAccountSessionFile != null">#{sysAccountSessionFile},</if>
+            <if test="sysAccountStringSession != null">#{sysAccountStringSession},</if>
+            <if test="sysAccountConcatsNumber != null">#{sysAccountConcatsNumber},</if>
+            <if test="sysAccountGroupNumber != null">#{sysAccountGroupNumber},</if>
+            <if test="sysAccountCreateTime != null">#{sysAccountCreateTime},</if>
+            <if test="sysAccountCreateTimezone != null">#{sysAccountCreateTimezone},</if>
+            <if test="sysAccountFirstName != null">#{sysAccountFirstName},</if>
+            <if test="sysAccountLastName != null">#{sysAccountLastName},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSysAccount" parameterType="SysAccount">
+        update sys_account
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sysUserId != null">sys_user_id = #{sysUserId},</if>
+
+            <if test="sysAccountPhone != null">sys_account_phone = #{sysAccountPhone},</if>
+            <if test="sysAccountSessionFile != null">sys_account_session_file = #{sysAccountSessionFile},</if>
+            <if test="sysAccountStringSession != null">sys_account_string_session = #{sysAccountStringSession},</if>
+            <if test="sysAccountConcatsNumber != null">sys_account_concats_number = #{sysAccountConcatsNumber},</if>
+            <if test="sysAccountGroupNumber != null">sys_account_group_number = #{sysAccountGroupNumber},</if>
+            <if test="sysAccountCreateTime != null">sys_account_create_time = #{sysAccountCreateTime},</if>
+            <if test="sysAccountCreateTimezone != null">sys_account_create_timeZone = #{sysAccountCreateTimezone},</if>
+            <if test="sysAccountOnline != null">sys_account_online = #{sysAccountOnline},</if>
+            sys_account_name = #{sysAccountName},
+            sys_account_about = #{sysAccountAbout},
+            sys_account_first_name = #{sysAccountFirstName},
+            sys_account_last_name = #{sysAccountLastName},
+        </trim>
+        where sys_account_id = #{sysAccountId}
+    </update>
+
+
+    <update id="updateSysAccountLoginStatus" parameterType="SysAccount">
+        update sys_account
+        <trim prefix="SET" suffixOverrides=",">
+            sys_account_login_status = #{sysAccountLoginStatus},
+        </trim>
+        where sys_account_id = #{sysAccountId}
+    </update>
+
+
+    <update id="updateSysAccountProFile" parameterType="SysAccount">
+        update sys_account
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sysUserId != null">sys_user_id = #{sysUserId},</if>
+            sys_account_name = #{sysAccountName},
+            sys_account_about = #{sysAccountAbout},
+            sys_account_first_name = #{sysAccountFirstName},
+            sys_account_last_name = #{sysAccountLastName},
+        </trim>
+        where sys_account_id = #{sysAccountId}
+    </update>
+
+    <update id="updateSysAccountUserName" parameterType="SysAccount">
+        update sys_account
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sysUserId != null">sys_user_id = #{sysUserId},</if>
+            sys_account_name = #{sysAccountName},
+            sys_account_about = #{sysAccountAbout},
+            sys_account_first_name = #{sysAccountFirstName},
+            sys_account_last_name = #{sysAccountLastName},
+        </trim>
+        where sys_account_id = #{sysAccountId}
+    </update>
+
+    <delete id="deleteSysAccountBySysAccountId" parameterType="Long">
+        delete from sys_account where sys_account_id = #{sysAccountId}
+    </delete>
+    <select id="selectByStrings"  parameterType="java.util.List" resultMap="SysAccountResult">
+        <include refid="selectSysAccountVo"/>
+        where sys_account_string_session in
+        <foreach item="sysAccountId" collection="list" open="(" separator="," close=")">
+            #{sysAccountId}
+        </foreach>
+    </select>
+
+
+    <delete id="deleteSysAccountBySysAccountIds" parameterType="String">
+        delete from sys_account where sys_account_id in
+        <foreach item="sysAccountId" collection="array" open="(" separator="," close=")">
+            #{sysAccountId}
+        </foreach>
+    </delete>
+</mapper>

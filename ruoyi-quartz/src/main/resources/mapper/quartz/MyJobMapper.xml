@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.common.mapper.MyJobMapper">
+
+	<resultMap type="MyJob" id="SysTaskResult">
+		<result property="jobId"    column="job_id"    />
+		<result property="sysAccountName"    column="sys_account_name"    />
+		<result property="jobName"    column="job_name"    />
+		<result property="jobType"    column="job_type"    />
+		<result property="tarNum"    column="tar_num"    />
+		<result property="successNum"    column="succes_num"    />
+		<result property="intervals"    column="intervals"    />
+		<result property="intervalsUnit"    column="intervals_unit"    />
+		<result property="intervalLoop"    column="loop_interval"    />
+		<result property="intervalLoopUnit"    column="loop_interval_unit"    />
+		<result property="parms"    column="parms"    />
+		<result property="jobGroup"    column="job_group"    />
+		<result property="jobClass"    column="job_class"    />
+		<result property="jobStatus"    column="job_status"    />
+		<result property="planDate"    column="job_plan_date"    />
+		<result property="loopEnd"    column="loop_end"    />
+		<result property="createDate"    column="create_date"    />
+		<result property="userId"    column="sys_user_id"    />
+
+	</resultMap>
+
+	<resultMap type="MyJobDetail" id="SysTaskDetailResult">
+		<result property="jobDetailId"    column="my_job_detail_id"    />
+		<result property="jobDetailStatus"    column="my_job_detail_status"    />
+		<result property="msg"    column="my_job_detail_msg"    />
+		<result property="jobDetailDate"    column="my_job_detail_date"    />
+		<result property="jobId"    column="my_job_id"    />
+		<result property="targ"    column="my_job_detail_targ"    />
+		<result property="taskClass"    column="my_job_detail_task_class"    />
+		<result property="index"    column="my_job_detail_index"    />
+		<result property="targId"    column="my_job_detail_targ_id"    />
+
+	</resultMap>
+
+
+
+
+	<insert id="insertMyJob" parameterType="MyJob" useGeneratedKeys="true" keyProperty="jobId">
+		insert into my_job(
+		<if test="jobId != null and jobId != 0">job_id,</if>
+		<if test="sysAccountName != null and sysAccountName != ''">sys_account_name,</if>
+		<if test="jobName != null and jobName != ''">job_name,</if>
+		<if test="jobType != null and jobType != ''">job_type,</if>
+		<if test="tarNum != null and tarNum != ''">tar_num,</if>
+		<if test="successNum != null and successNum != ''">succes_num,</if>
+		<if test="intervals != null and intervals != ''">intervals,</if>
+		<if test="intervalsUnit != null">intervals_unit,</if>
+		<if test="intervalLoop != null and intervalLoop != ''">loop_interval,</if>
+		<if test="intervalLoopUnit != null ">loop_interval_unit,</if>
+		<if test="jobGroup != null and jobGroup != ''">job_group,</if>
+		<if test="parms != null and parms != ''">parms,</if>
+		<if test="userId != null and userId != 0">sys_user_id,</if>
+		<if test="loopEnd != null and loopEnd != 0">loop_end,</if>
+		<if test="planDate != null">job_plan_date,</if>
+		<if test="createDate != null ">create_date</if>
+
+		)values(
+		<if test="jobId != null and jobId != 0">#{jobId},</if>
+		<if test="sysAccountName != null and sysAccountName != ''">#{sysAccountName},</if>
+		<if test="jobName != null and jobName != ''">#{jobName},</if>
+		<if test="jobType != null and jobType != ''">#{jobType},</if>
+		<if test="tarNum != null and tarNum != 0">#{tarNum},</if>
+		<if test="successNum != null and successNum != 0">#{successNum},</if>
+		<if test="intervals != null and intervals != ''">#{intervals},</if>
+		<if test="intervalsUnit != null ">#{intervalsUnit},</if>
+		<if test="intervalLoop != null and intervalLoop != ''">#{intervalLoop},</if>
+		<if test="intervalLoopUnit != null ">#{intervalLoopUnit},</if>
+		<if test="jobGroup != null and jobGroup != ''">#{jobGroup},</if>
+		<if test="parms != null and parms != ''">#{parms},</if>
+		<if test="userId != null and userId != 0">#{userId},</if>
+		<if test="loopEnd != null and loopEnd != 0">#{loopEnd},</if>
+		<if test="planDate != null ">#{planDate},</if>
+		<if test="createDate != null ">#{createDate}</if>
+		)
+		on duplicate key update job_id =#{jobId},sys_account_name=#{sysAccountName},job_name=#{jobName},job_type=#{jobType},
+		tar_num=#{tarNum},succes_num=#{successNum},intervals=#{intervals},intervals_unit=#{intervalsUnit},loop_interval=#{intervalLoop},loop_interval_unit=#{intervalLoopUnit}
+		,job_group=#{jobGroup},parms=#{parms},sys_user_id=#{userId},create_date=#{createDate},job_plan_date=#{planDate},loop_end=#{loopEnd},job_status=#{jobStatus}
+	</insert>
+
+
+	<update id="updateMyJob" parameterType="long" >
+		update my_job a set a.succes_num=a.succes_num+1,a.job_status='2'
+		where job_id =#{jobId}
+	</update>
+
+
+	<update id="updateMyJobFail" parameterType="long" >
+		update my_job a set a.succes_num=a.succes_num,a.job_status='2'
+		where job_id =#{jobId}
+	</update>
+
+	<update id="updateMyJobAndStatus" parameterType="long" >
+		update my_job a set a.succes_num=a.succes_num+1,a.job_status=3  where job_id =#{jobId}
+	</update>
+
+	<update id="updateMyJobMessageGroup">
+		update my_job a set a.parms=#{parms} where job_id =#{jobId}
+	</update>
+
+	<update id="updateMyJobAndStatusFail" parameterType="long" >
+		update my_job a set a.succes_num=a.succes_num,a.job_status=3  where job_id =#{jobId}
+	</update>
+
+	<select id="selectJobById" parameterType="Long" resultMap="SysTaskResult">
+		select * from my_job where job_id=#{jobId}
+	</select>
+
+
+
+	<insert id="insertMyJobDetail" parameterType="MyJobDetail" useGeneratedKeys="true" keyProperty="jobDetailId">
+		insert into my_job_detail(
+		<if test="jobDetailId != null and jobDetailId != 0">my_job_detail_id,</if>
+		<if test="jobDetailStatus != null ">my_job_detail_status,</if>
+		<if test="jobDetailDate != null">my_job_detail_date,</if>
+		<if test="msg != null and msg != ''">my_job_detail_msg,</if>
+		<if test="jobId != null and jobId != ''">my_job_id,</if>
+		<if test="targ != null and targ != ''">my_job_detail_targ,</if>
+		<if test="taskClass != null and taskClass != ''">my_job_detail_task_class,</if>
+		<if test="targId != null and targId != ''">my_job_detail_targ_id,</if>
+		<if test="index != null ">my_job_detail_index</if>
+
+		)values(
+		<if test="jobDetailId != null and jobDetailId != 0">#{jobDetailId},</if>
+		<if test="jobDetailStatus != null ">#{jobDetailStatus},</if>
+		<if test="jobDetailDate != null">#{jobDetailDate},</if>
+		<if test="msg != null and msg != ''">#{msg},</if>
+		<if test="jobId != null and jobId != ''">#{jobId},</if>
+		<if test="targ != null and targ != ''">#{targ},</if>
+		<if test="taskClass != null and taskClass != ''">#{taskClass},</if>
+		<if test="targId != null and targId != ''">#{targId},</if>
+		<if test="index != null ">#{index}</if>
+
+		)
+		on duplicate key update my_job_detail_id =#{jobDetailId},my_job_detail_status=#{jobDetailStatus},my_job_detail_date=#{jobDetailDate},my_job_detail_msg=#{msg},
+		my_job_id=#{jobId},my_job_detail_targ=#{targ},my_job_detail_targ_id=#{targId},my_job_detail_task_class=#{taskClass},my_job_detail_index=#{index}
+
+	</insert>
+
+	<insert id="batchMyJobDetail">
+		insert into my_job_detail( my_job_detail_status,my_job_id,my_job_detail_targ,my_job_detail_task_class,my_job_detail_index,my_job_detail_targ_id) values
+		<foreach item="item" index="index" collection="list" separator=",">
+			(#{item.jobDetailStatus},#{item.jobId},#{item.targ},#{item.taskClass},#{item.index},#{item.targId})
+		</foreach>
+	</insert>
+
+</mapper> 

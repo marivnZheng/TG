@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysGroupMapper">
+
+    <resultMap type="SysGroup" id="SysGroupResult">
+        <result property="sysGroupId"    column="sys_group_id"    />
+        <result property="sysUserId"    column="sys_user_id"    />
+        <result property="sysGroupTitle"    column="sys_group_title"    />
+        <result property="sysGroupLink"    column="sys_group_link"    />
+        <result property="sysGroupDetail"    column="sys_group_detail"    />
+        <result property="sysGroupSendPhoto"    column="sys_group_send_photo"    />
+        <result property="sysGroupSendMessage"    column="sys_group_send_message"    />
+        <result property="sysGroupInvite"    column="sys_group_invite"    />
+        <result property="sysAccountStringSession"    column="sys_account_string_session"    />
+    </resultMap>
+
+    <sql id="selectSysGroupVo">
+        select sys_group_id, sys_user_id, sys_group_title, sys_group_link, sys_group_detail, sys_group_send_photo, sys_group_send_message, sys_group_invite,sys_account_string_session from sys_group
+    </sql>
+
+    <select id="selectSysGroupList" parameterType="SysGroup" resultMap="SysGroupResult">
+        <include refid="selectSysGroupVo"/>
+        <where>
+            <if test="sysUserId != null "> and sys_user_id = #{sysUserId}</if>
+            <if test="sysGroupTitle != null"> and sys_group_title like concat('%', #{sysGroupTitle}, '%')</if>
+            <if test="sysGroupLink == 'false'"> and sys_group_link is null</if>
+            <if test="sysGroupLink == 'true'"> and sys_group_link is not null</if>
+            <if test="sysGroupDetail != null"> and sys_group_detail = #{sysGroupDetail}</if>
+            <if test="sysGroupSendPhoto != null "> and sys_group_send_photo = #{sysGroupSendPhoto}</if>
+            <if test="sysGroupSendMessage != null "> and sys_group_send_message = #{sysGroupSendMessage}</if>
+            <if test="sysAccountStringSession != null"> and sys_account_string_session = #{sysAccountStringSession}</if>
+            <if test="sysGroupInvite != null"> and sys_group_invite = #{sysGroupInvite}</if>
+        </where>
+    </select>
+
+    <select id="selectSysGroupBySysGroupId" parameterType="Long" resultMap="SysGroupResult">
+        <include refid="selectSysGroupVo"/>
+        where sys_group_id = #{sysGroupId}
+    </select>
+
+    <select id="selectSysGroupByAccountString" parameterType="String" resultMap="SysGroupResult">
+        <include refid="selectSysGroupVo"/>
+        where sys_account_string_session = #{StringSession}
+    </select>
+
+
+    <insert id="insertSysGroup" parameterType="SysGroup">
+        insert into sys_group
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sysGroupId != null">sys_group_id,</if>
+            <if test="sysUserId != null">sys_user_id,</if>
+            <if test="sysGroupTitle != null">sys_group_title,</if>
+            <if test="sysGroupLink != null">sys_group_link,</if>
+            <if test="sysGroupDetail != null">sys_group_detail,</if>
+            <if test="sysGroupSendPhoto != null">sys_group_send_photo,</if>
+            <if test="sysGroupSendMessage != null">sys_group_send_message,</if>
+            <if test="sysGroupInvite != null">sys_group_invite,</if>
+            <if test="sysAccountStringSession != null">sys_account_string_session,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sysGroupId != null">#{sysGroupId},</if>
+            <if test="sysUserId != null">#{sysUserId},</if>
+            <if test="sysGroupTitle != null">#{sysGroupTitle},</if>
+            <if test="sysGroupLink != null">#{sysGroupLink},</if>
+            <if test="sysGroupDetail != null">#{sysGroupDetail},</if>
+            <if test="sysGroupSendPhoto != null">#{sysGroupSendPhoto},</if>
+            <if test="sysGroupSendMessage != null">#{sysGroupSendMessage},</if>
+            <if test="sysGroupInvite != null">#{sysGroupInvite},</if>
+            <if test="sysAccountStringSession != null">#{sysAccountStringSession},</if>
+        </trim>
+        on duplicate key update sys_group_id =#{sysGroupId},sys_user_id=#{sysUserId},sys_group_title=#{sysGroupTitle},sys_group_link=#{sysGroupLink},
+        sys_account_string_session=#{sysAccountStringSession},
+        sys_group_detail=#{sysGroupDetail},sys_group_send_photo=#{sysGroupSendPhoto},sys_group_send_message=#{sysGroupSendMessage},sys_group_invite=#{sysGroupInvite}
+    </insert>
+
+    <update id="updateSysGroup" parameterType="SysGroup">
+        update sys_group
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sysUserId != null">sys_user_id = #{sysUserId},</if>
+            <if test="sysGroupTitle != null">sys_group_title = #{sysGroupTitle},</if>
+            <if test="sysGroupLink != null">sys_group_link = #{sysGroupLink},</if>
+            <if test="sysGroupDetail != null">sys_group_detail = #{sysGroupDetail},</if>
+            <if test="sysGroupSendPhoto != null">sys_group_send_photo = #{sysGroupSendPhoto},</if>
+            <if test="sysGroupSendMessage != null">sys_group_send_message = #{sysGroupSendMessage},</if>
+            <if test="sysGroupInvite != null">sys_group_invite = #{sysGroupInvite},</if>
+        </trim>
+        where sys_group_id = #{sysGroupId}
+    </update>
+
+    <delete id="deleteSysGroupBySysGroupId" parameterType="Long">
+        delete from sys_group where sys_group_id = #{sysGroupId}
+    </delete>
+
+    <delete id="deleteSysGroupBySysGroupIds" parameterType="String">
+        delete from sys_group where sys_group_id in
+        <foreach item="sysGroupId" collection="array" open="(" separator="," close=")">
+            #{sysGroupId}
+        </foreach>
+    </delete>
+</mapper>
