@@ -18,6 +18,7 @@ import com.ruoyi.common.domain.MyJobDetail;
 import com.ruoyi.common.mapper.MyJobMapper;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.system.domain.InviteGroupDTO;
 import com.ruoyi.system.domain.SysAccount;
 import com.ruoyi.system.domain.SysContact;
 import com.ruoyi.system.mapper.SysAccountMapper;
@@ -170,29 +171,24 @@ public class SysGroupServiceImpl implements ISysGroupService
     }
 
     @Override
-    public AjaxResult inviteGroup(HashMap map) throws InterruptedException, IOException {
-        Integer groupId= (Integer) map.get("groupId");
-        List<HashMap> contactList = (List<HashMap>) map.get("concatsList");
-        String sysAccountId = map.get("sysAccountId").toString();
-        String min = map.get("min").toString();
-        Integer minCount = (Integer) map.get("minCount");
-        int tarNum=contactList.size();
+    public AjaxResult inviteGroup(InviteGroupDTO dto) throws InterruptedException, IOException {
+        int tarNum=dto.getConcatsList().size();
         long date = System.currentTimeMillis();
         boolean jobFlag=tarNum>1;
         HashMap jobIds = new HashMap();
-        SysAccount sysAccount = sysAccountMapper.selectSysAccountBySysAccountId(Long.valueOf(sysAccountId));
-        SysGroup sysGroup = sysGroupMapper.selectSysGroupBySysGroupId(Long.valueOf(groupId));
+        SysAccount sysAccount = sysAccountMapper.selectSysAccountBySysAccountId(Long.valueOf(dto.getSysAccountId()));
+        SysGroup sysGroup = sysGroupMapper.selectSysGroupBySysGroupId(Long.valueOf(dto.getGroupId()));
         if(jobFlag){
             HashMap parms = new HashMap();
             parms.put("sessionString", sysAccount.getSysAccountStringSession());
-            parms.put("channelId", groupId);
+            parms.put("channelId", dto.getGroupId());
             MyJob job = new MyJob();
-            job.setTarNum(contactList.size());
+            job.setTarNum(dto.getConcatsList().size());
             job.setJobType("1");
             job.setJobName("邀请进群"+sysGroup.getSysGroupTitle());
             job.setJobClass("com.ruoyi.system.runnable.InvoteGroupRunnable");
-            job.setIntervals(minCount+"");
-            job.setIntervalsUnit(Integer.valueOf(min));
+            job.setIntervals(dto.getMinCount()+"");
+            job.setIntervalsUnit(Integer.valueOf(dto.getMin().toString()));
             job.setJobGroup(String.valueOf(date));
             job.setCreateDate(DateUtils.getNowDate());
             job.setParms(JSON.toJSONString(parms));
@@ -205,7 +201,7 @@ public class SysGroupServiceImpl implements ISysGroupService
             jobIds.put(sysAccount.getSysAccountId(),job.getJobId());
             int index =1;
             List<MyJobDetail> myJobDetails= new ArrayList<>();
-            for (Map s1 : contactList) {
+            for (SysContact contact : dto.getConcatsList()) {
 
                 MyJobDetail jobDetail = new MyJobDetail();
                 long jobId = (Long) jobIds.get(sysAccount.getSysAccountId());
@@ -214,7 +210,7 @@ public class SysGroupServiceImpl implements ISysGroupService
                 jobDetail.setJobDetailStatus(-1);
                 jobDetail.setTaskClass("com.ruoyi.system.runnable.InvoteGroupRunnable");
                 jobDetail.setIndex(index);
-                jobDetail.setTarg((String) s1.get("sysContactUserName"));
+                jobDetail.setTarg((String) contact.getSysContactUserName());
                 myJobDetails.add(jobDetail);
                 index++;
             }
@@ -222,11 +218,11 @@ public class SysGroupServiceImpl implements ISysGroupService
             partition.forEach(e -> myJobMapper.batchMyJobDetail(e));
 
         }else{
-            for (Map s1 : contactList) {
+            for (SysContact contact : dto.getConcatsList()) {
                 HashMap parms = new HashMap();
                 parms.put("sessionString", sysAccount.getSysAccountStringSession());
-                parms.put("channelId",groupId);
-                parms.put("sysContactUserName",s1.get("sysContactUserName"));
+                parms.put("channelId",dto.getGroupId());
+                parms.put("sysContactUserName",contact.getSysContactUserName());
                 String result = tgUtil.GenerateCommand("InvoteGroup", parms);
                 Map resultMap = JSON.parseObject(result, Map.class);
                 if (resultMap.get("code").equals("304")) {

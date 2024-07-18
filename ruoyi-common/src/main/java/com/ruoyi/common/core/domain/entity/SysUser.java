@@ -92,6 +92,11 @@ public class SysUser extends BaseEntity
     /**  账号等级  */
     private Long accountDetailId;
 
+    private Long vipDate;
+
+
+
+
     public SysUser()
     {
 
@@ -306,6 +311,14 @@ public class SysUser extends BaseEntity
     public void setRoleId(Long roleId)
     {
         this.roleId = roleId;
+    }
+
+    public Long getVipDate() {
+        return vipDate;
+    }
+
+    public void setVipDate(Long vipDate) {
+        this.vipDate = vipDate;
     }
 
     @Override

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.system.domain.InviteGroupDTO;
 import com.ruoyi.system.domain.SysAccount;
 import com.ruoyi.system.domain.SysContact;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -137,8 +138,8 @@ public class SysGroupController extends BaseController
 
     @PreAuthorize("@ss.hasPermi('system:contacts:list')")
     @PostMapping("/inviteGroup")
-    public AjaxResult inviteGroup(@RequestBody HashMap map) throws InterruptedException, IOException {
-        return  sysGroupService.inviteGroup(map);
+    public AjaxResult inviteGroup(@RequestBody InviteGroupDTO dto) throws InterruptedException, IOException {
+        return  sysGroupService.inviteGroup(dto);
 
     }
 

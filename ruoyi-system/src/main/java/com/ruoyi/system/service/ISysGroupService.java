@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.domain.InviteGroupDTO;
 import com.ruoyi.system.domain.SysAccount;
 import com.ruoyi.system.domain.SysContact;
 import com.ruoyi.system.domain.SysGroup;
@@ -68,7 +69,7 @@ public interface ISysGroupService
 
     public AjaxResult syncGroup(List<SysAccount> accountList);
 
-    public AjaxResult inviteGroup(HashMap map) throws InterruptedException, IOException;
+    public AjaxResult inviteGroup(InviteGroupDTO dto) throws InterruptedException, IOException;
 
     public AjaxResult inviteGroupList(HashMap map);
 

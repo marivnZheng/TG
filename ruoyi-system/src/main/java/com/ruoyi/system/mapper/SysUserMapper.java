@@ -35,6 +35,9 @@ public interface SysUserMapper
      */
     public List<SysUser> selectUnallocatedList(SysUser user);
 
+
+    public List<SysUser> selectVipUser();
+
     /**
      * 通过用户名查询用户
      * 
@@ -66,6 +69,10 @@ public interface SysUserMapper
      * @return 结果
      */
     public int updateUser(SysUser user);
+
+    public int updateUserVipDate(Long userId,Long vipDate);
+
+    public int updateUserVip(Long userId);
 
     /**
      * 修改用户头像

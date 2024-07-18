@@ -291,6 +291,12 @@ public class SysAccountServiceImpl implements ISysAccountService
     @Override
     public AjaxResult sessionFileLogin(String jsonStr) throws InterruptedException, IOException {
         JSONArray objects = JSON.parseArray(jsonStr);
+        SysAccountDetail sysAccountDetail = sysAccountDetailService.selectAccountDetailByLeverId(getLoginUser().getUser().getUserId());
+        int num = sysAccountMapper.selectCountUserId(getLoginUser().getUser().getUserId());
+        if(sysAccountDetail.getAccountNum()<num+objects.size()){
+            String errorMsg= "最大只能登入"+sysAccountDetail.getAccountNum();
+            return error(errorMsg);
+        }
         for (int i = 0; i < objects.size(); i++) {
             JSONObject jsonObject = objects.getJSONObject(i);
             String name = jsonObject.getString("fileName");
