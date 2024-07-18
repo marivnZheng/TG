@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.ruoyi.common.domain.MyJobDetail;
 import com.ruoyi.common.mapper.MyJobMapper;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.util.TGUtil;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class addContactPhoneRunnable implements Runnable {
     public void run() {
         TGUtil tgUtil = new TGUtil();
         HashMap map = JSON.parseObject(parms,HashMap.class);
-        map.put("phone",myJobDetail.getTargId());
+        map.put("userName", StringUtils.isEmpty(myJobDetail.getTarg())?myJobDetail.getTargId():myJobDetail.getTarg());
         try {
             String result = tgUtil.GenerateCommand("addContactTgPhone",map);
             Map resultMap = JSON.parseObject(result, Map.class);

@@ -57,6 +57,16 @@ public class SysGroup extends BaseEntity
 
     private String sysAccountStringSession;
 
+    private Long sysAccountId;
+
+
+    public Long getSysAccountId() {
+        return sysAccountId;
+    }
+
+    public void setSysAccountId(Long sysAccountId) {
+        this.sysAccountId = sysAccountId;
+    }
 
     public String getSysGroupDetailExcel() {
         return sysGroupDetailExcel;

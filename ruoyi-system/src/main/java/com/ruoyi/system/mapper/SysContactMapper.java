@@ -45,6 +45,8 @@ public interface SysContactMapper
 
     public List<SysContact> selectSysContactBySysAccount(long accountId);
 
+
+    public int deleteSysContactByAccountId(long accountId);
     /**
      * 删除
      * 

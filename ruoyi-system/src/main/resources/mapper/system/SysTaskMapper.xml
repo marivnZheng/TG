@@ -85,7 +85,7 @@
 
 
     <select id="selectSysTaskDetailListOrderByIndex" parameterType="Long" resultMap="SysTaskDetailResult">
-        select  * from my_job_detail a where my_job_detail_status =-1 or my_job_detail_status =-2  ORDER  BY my_job_detail_index LIMIT 0,1
+        select  * from my_job_detail a where (my_job_detail_status =-1 or my_job_detail_status =-2) and my_job_id=#{jobId}  ORDER  BY my_job_detail_index LIMIT 0,1
     </select>
 
 </mapper>

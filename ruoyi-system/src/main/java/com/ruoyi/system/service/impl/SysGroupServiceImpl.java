@@ -26,6 +26,7 @@ import com.ruoyi.system.runnable.InvoteGroupRunnable;
 import com.ruoyi.system.runnable.JoinGroupRunnable;
 import com.ruoyi.system.runnable.addContactRunnable;
 import com.ruoyi.system.util.TGUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.SysGroupMapper;
@@ -42,6 +43,7 @@ import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
  * @date 2024-05-14
  */
 @Service
+@Slf4j
 public class SysGroupServiceImpl implements ISysGroupService 
 {
     @Autowired
@@ -137,9 +139,12 @@ public class SysGroupServiceImpl implements ISysGroupService
     public AjaxResult syncGroup(List<SysAccount> accountList) {
         accountList.forEach(e->{
             String sysAccountStringSession = e.getSysAccountStringSession();
+            Long sysAccountId = e.getSysAccountId();
             HashMap parms = new HashMap();
             parms.put("sysAccountStringSession",sysAccountStringSession);
             try {
+                log.info("当前账号为：{}，账号为：{}，开始同步好友。",getLoginUser().getUsername(),e.getSysAccountId());
+                sysGroupMapper.deleteSysContactByAccountId(e.getSysAccountId());
                 String syncGroup = tgUtil.GenerateCommand("syncGroup", parms);
                 for (String s : syncGroup.split("\n")) {
                     String substring = s.substring(s.indexOf("{"), s.indexOf("}")+1);
@@ -154,6 +159,7 @@ public class SysGroupServiceImpl implements ISysGroupService
                     group.setSysGroupInvite(Long.valueOf((Boolean)map.get("inviteUsers")?0:1));
                     group.setSysUserId(getLoginUser().getUserId());
                     group.setSysAccountStringSession(sysAccountStringSession);
+                    group.setSysAccountId(sysAccountId);
                     sysGroupMapper.insertSysGroup(group);
                 }
             } catch (InterruptedException | IOException ex) {

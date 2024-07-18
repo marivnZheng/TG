@@ -12,6 +12,8 @@ import java.util.Set;
  * 
  * @author ruoyi
  */
+
+
 public class LoginUser implements UserDetails
 {
     private static final long serialVersionUID = 1L;

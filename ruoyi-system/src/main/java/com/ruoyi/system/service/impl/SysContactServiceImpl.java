@@ -15,6 +15,7 @@ import com.ruoyi.system.mapper.SysAccountMapper;
 import com.ruoyi.system.mapper.SysContactMapper;
 import com.ruoyi.system.service.ISysContactService;
 import com.ruoyi.system.util.TGUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,7 @@ import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
  * @date 2024-05-11
  */
 @Service
+@Slf4j
 public class SysContactServiceImpl implements ISysContactService {
     @Autowired
     private SysContactMapper sysContactMapper;
@@ -66,6 +68,8 @@ public class SysContactServiceImpl implements ISysContactService {
             String sysAccountStringSession = e.getSysAccountStringSession();
             HashMap parms = new HashMap();
             parms.put("sysAccountStringSession", sysAccountStringSession);
+            log.info("当前账号为：{}，账号为：{}，开始同步好友。",getLoginUser().getUsername(),e.getSysAccountId());
+            sysContactMapper.deleteSysContactByAccountId(e.getSysAccountId());
             try {
                 String syncContact = tgUtil.GenerateCommand("syncContact", parms);
                 for (String s : syncContact.split("\n")) {

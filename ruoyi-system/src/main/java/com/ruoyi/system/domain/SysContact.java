@@ -1,5 +1,10 @@
 package com.ruoyi.system.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
@@ -13,6 +18,12 @@ import java.util.List;
  * @author ruoyi
  * @date 2024-05-11
  */
+
+@EqualsAndHashCode(callSuper = true)
+@Data
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class SysContact extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -41,108 +52,5 @@ public class SysContact extends BaseEntity
 
     private List<String> sysAccountIds;
 
-    public String getSysContactPhone() {
-        return sysContactPhone;
-    }
 
-    public void setSysContactPhone(String sysContactPhone) {
-        this.sysContactPhone = sysContactPhone;
-    }
-
-    public void setSysContactId(Long sysContactId)
-    {
-        this.sysContactId = sysContactId;
-    }
-
-    public Long getSysContactId()
-    {
-        return sysContactId;
-    }
-    public void setSysAccountId(Long sysAccountId) 
-    {
-        this.sysAccountId = sysAccountId;
-    }
-
-    public Long getSysAccountId() 
-    {
-        return sysAccountId;
-    }
-    public void setSysUserId(Long sysUserId) 
-    {
-        this.sysUserId = sysUserId;
-    }
-
-    public Long getSysUserId() 
-    {
-        return sysUserId;
-    }
-    public void setSysContactName(String sysContactName)
-    {
-        this.sysContactName = sysContactName;
-    }
-
-    public String getSysContactName()
-    {
-        return sysContactName;
-    }
-    public void setSysContactUserName(String sysContactUserName)
-    {
-        this.sysContactUserName = sysContactUserName;
-    }
-
-    public String getSysContactUserName()
-    {
-        return sysContactUserName;
-    }
-    public void setSysMutualContact(Long sysMutualContact) 
-    {
-        this.sysMutualContact = sysMutualContact;
-    }
-
-    public Long getSysMutualContact()
-    {
-        return sysMutualContact;
-    }
-    public void setSysStatus(Long sysStatus) 
-    {
-        this.sysStatus = sysStatus;
-    }
-
-    public Long getSysStatus() 
-    {
-        return sysStatus;
-    }
-
-    public String getUserNameAdd() {
-        return userNameAdd;
-    }
-
-    public void setUserNameAdd(String userNameAdd) {
-        this.userNameAdd = userNameAdd;
-    }
-
-    public List<String> getSysAccountIds() {
-
-        return sysAccountIds;
-    }
-
-    public void setSysAccountIds(List<String> sysAccountIds) {
-        this.sysAccountIds = sysAccountIds;
-    }
-
-    @Override
-    public String toString() {
-        return "SysContact{" +
-                "sysContactId=" + sysContactId +
-                ", sysAccountId=" + sysAccountId +
-                ", sysUserId=" + sysUserId +
-                ", sysContactName='" + sysContactName + '\'' +
-                ", sysContactUserName='" + sysContactUserName + '\'' +
-                ", sysMutualContact=" + sysMutualContact +
-                ", sysStatus=" + sysStatus +
-                ", sysContactPhone='" + sysContactPhone + '\'' +
-                ", userNameAdd='" + userNameAdd + '\'' +
-                ", sysAccountIds=" + sysAccountIds +
-                '}';
-    }
 }

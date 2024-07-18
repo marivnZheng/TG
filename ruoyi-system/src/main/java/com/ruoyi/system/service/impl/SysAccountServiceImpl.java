@@ -11,9 +11,11 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysAccount;
+import com.ruoyi.system.domain.SysAccountDetail;
 import com.ruoyi.system.domain.SysGroup;
 import com.ruoyi.system.dto.TgLogin;
 import com.ruoyi.system.mapper.SysAccountMapper;
+import com.ruoyi.system.service.ISysAccountDetailService;
 import com.ruoyi.system.service.ISysAccountService;
 import com.ruoyi.system.util.TGUtil;
 import org.python.antlr.ast.Str;
@@ -48,6 +50,9 @@ public class SysAccountServiceImpl implements ISysAccountService
     @Autowired
     private TGUtil tgUtil;
 
+    @Autowired
+    private  ISysAccountDetailService sysAccountDetailService;
+
     /**
      * 查询
      * 
@@ -58,30 +63,6 @@ public class SysAccountServiceImpl implements ISysAccountService
     public SysAccount selectSysAccountBySysAccountId(Long sysAccountId)
     {
         return sysAccountMapper.selectSysAccountBySysAccountId(sysAccountId);
-    }
-
-    @Override
-    public AjaxResult virefyUser() {
-        LoginUser loginUser = getLoginUser();
-        List<SysRole> roles = loginUser.getUser().getRoles();
-        //查看已登录账号数量
-        int i = sysAccountMapper.selectCountUserId(loginUser.getUserId());
-        if(roles.get(0).getRoleKey().equals("common")){
-            //最多一个账号
-            if(1-i>0){
-                return  new AjaxResult(200,"可以登录账号");
-            }else{
-                return  new AjaxResult(400,"已到达上限");
-            }
-        }else if (roles.get(0).getRoleKey().equals("common10")){
-            if(10-i>0){
-                return  new AjaxResult(200,"可以登录账号");
-            }else{
-                return  new AjaxResult(400,"已到达上限");
-            }
-        }
-
-        return   new AjaxResult(200,"可以登录账号");
     }
 
     /**
@@ -148,6 +129,23 @@ public class SysAccountServiceImpl implements ISysAccountService
         parms.put("phoneNumber",phoneNumber);
         String sendPhoneCode = tgUtil.GenerateCommand("sendPhoneCode", parms);
         return new TgLogin(sendPhoneCode,phoneNumber);
+    }
+
+    @Override
+    public AjaxResult checkPhoneAndUserJurisdiction(String phoneNumber) {
+        LoginUser loginUser = getLoginUser();
+        SysAccountDetail sysAccountDetail = sysAccountDetailService.selectAccountDetailByLeverId(loginUser.getUser().getAccountDetailId());
+        int i = sysAccountMapper.selectCountUserId(loginUser.getUserId());
+        if(sysAccountDetail.getAccountNum()<i+1){
+            String errorMsg= "最大只能登入"+sysAccountDetail.getAccountNum();
+            return error(errorMsg);
+        }
+        List<SysAccount> sysAccounts = sysAccountMapper.selectSysAccountList(new SysAccount().setSysAccountPhone(phoneNumber));
+        if(sysAccounts.size()>0){
+            String errorMsg= "改账号已经登入其它用户";
+            return  error(errorMsg);
+        }
+        return success();
     }
 
     @Override

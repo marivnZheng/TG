@@ -14,10 +14,11 @@
         <result property="sysGroupSendMessage"    column="sys_group_send_message"    />
         <result property="sysGroupInvite"    column="sys_group_invite"    />
         <result property="sysAccountStringSession"    column="sys_account_string_session"    />
+        <result property="sysAccountId"    column="sys_account_id"    />
     </resultMap>
 
     <sql id="selectSysGroupVo">
-        select sys_group_id, sys_user_id, sys_group_title, sys_group_link, sys_group_detail, sys_group_send_photo, sys_group_send_message, sys_group_invite,sys_account_string_session from sys_group
+        select sys_group_id, sys_user_id, sys_group_title, sys_group_link, sys_group_detail, sys_group_send_photo, sys_group_send_message, sys_group_invite,sys_account_string_session,sys_account_id from sys_group
     </sql>
 
     <select id="selectSysGroupList" parameterType="SysGroup" resultMap="SysGroupResult">
@@ -58,6 +59,7 @@
             <if test="sysGroupSendMessage != null">sys_group_send_message,</if>
             <if test="sysGroupInvite != null">sys_group_invite,</if>
             <if test="sysAccountStringSession != null">sys_account_string_session,</if>
+            <if test="sysAccountId != null">sys_account_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="sysGroupId != null">#{sysGroupId},</if>
@@ -69,9 +71,11 @@
             <if test="sysGroupSendMessage != null">#{sysGroupSendMessage},</if>
             <if test="sysGroupInvite != null">#{sysGroupInvite},</if>
             <if test="sysAccountStringSession != null">#{sysAccountStringSession},</if>
+            <if test="sysAccountId != null">sys_account_id,</if>
         </trim>
         on duplicate key update sys_group_id =#{sysGroupId},sys_user_id=#{sysUserId},sys_group_title=#{sysGroupTitle},sys_group_link=#{sysGroupLink},
         sys_account_string_session=#{sysAccountStringSession},
+        sys_account_id=#{sysAccountId},
         sys_group_detail=#{sysGroupDetail},sys_group_send_photo=#{sysGroupSendPhoto},sys_group_send_message=#{sysGroupSendMessage},sys_group_invite=#{sysGroupInvite}
     </insert>
 
@@ -92,6 +96,12 @@
     <delete id="deleteSysGroupBySysGroupId" parameterType="Long">
         delete from sys_group where sys_group_id = #{sysGroupId}
     </delete>
+
+
+    <delete id="deleteSysContactByAccountId" parameterType="Long">
+        delete from sys_group where sys_account_id = #{sysAccountId}
+    </delete>
+
 
     <delete id="deleteSysGroupBySysGroupIds" parameterType="String">
         delete from sys_group where sys_group_id in

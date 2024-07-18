@@ -89,6 +89,9 @@ public class SysUser extends BaseEntity
     /** 角色ID */
     private Long roleId;
 
+    /**  账号等级  */
+    private Long accountDetailId;
+
     public SysUser()
     {
 
@@ -97,6 +100,14 @@ public class SysUser extends BaseEntity
     public SysUser(Long userId)
     {
         this.userId = userId;
+    }
+
+    public Long getAccountDetailId() {
+        return accountDetailId;
+    }
+
+    public void setAccountDetailId(Long accountDetailId) {
+        this.accountDetailId = accountDetailId;
     }
 
     public Long getUserId()

@@ -54,6 +54,17 @@ public interface SysGroupMapper
      */
     public int deleteSysGroupBySysGroupId(Long sysGroupId);
 
+
+    /**
+     * 删除
+     *
+     * @param sysAccountId 主键
+     * @return 结果
+     */
+    public int deleteSysContactByAccountId(Long sysAccountId);
+
+
+
     /**
      * 批量删除
      * 

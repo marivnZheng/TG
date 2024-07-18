@@ -70,14 +70,6 @@ public class SysAccountController extends BaseController
         return success(sysAccountService.selectSysAccountBySysAccountId(sysAccountId));
     }
 
-    @PreAuthorize("@ss.hasPermi('system:account:query')")
-    @GetMapping(value = "/virefyUser")
-    public AjaxResult virefyUser()
-    {
-        return success(sysAccountService.virefyUser());
-    }
-
-
     /**
      * 发送验证码
      */
@@ -88,11 +80,19 @@ public class SysAccountController extends BaseController
     }
 
     @PreAuthorize("@ss.hasPermi('system:account:query')")
+    @GetMapping(value = "checkPhoneAndUserJurisdiction/{phoneNumber}")
+    public AjaxResult checkPhoneAndUserJurisdiction(@PathVariable("phoneNumber") String phoneNumber) throws InterruptedException, IOException {
+
+        return sysAccountService.checkPhoneAndUserJurisdiction(phoneNumber);
+    }
+
+    @PreAuthorize("@ss.hasPermi('system:account:query')")
     @PostMapping(value = "loginAccountByPhoneCode")
     public AjaxResult loginAccountByPhoneCode(@RequestBody TgLogin tgLogin) throws InterruptedException, IOException {
         AjaxResult ajaxResult = sysAccountService.loginAccountByPhoneCode(tgLogin);
         return ajaxResult;
     }
+
 
     @PreAuthorize("@ss.hasPermi('system:account:query')")
     @PostMapping(value = "sessionFileUpload")

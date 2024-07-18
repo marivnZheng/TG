@@ -6,8 +6,6 @@ import com.ruoyi.common.domain.MyJobDetail;
 import com.ruoyi.common.mapper.MyJobMapper;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.system.domain.SysContact;
-import com.ruoyi.system.domain.SysGroup;
 import com.ruoyi.system.util.TGUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -87,27 +85,17 @@ public class sendMessageContactRunnable implements Runnable {
                         String parmsString =JSON.toJSONString(map);
                         MyJob myJob = myJobMapper.selectJobById(myJobDetail.getJobId());
                         myJob.setParms(parmsString);
-                        //计算下次时间
-                        if(StringUtils.equals(myJob.getJobType(),"2")){
-                            String intervalLoop = myJob.getIntervalLoop();
-                            int intervalLoopUnit = myJob.getIntervalLoopUnit();
-                            Date nowDate = DateUtils.getNowDate();
-                            if(intervalLoopUnit==1){
-                                //循环间隔为分钟
-                                Date date = DateUtils.addMinutes(nowDate, Integer.valueOf(intervalLoop));
-                                myJob.setPlanDate(date);
-                            }else if(intervalLoopUnit==2){
-                                //循环间隔为小时
-                                Date date = DateUtils.addHours(nowDate, Integer.valueOf(intervalLoop));
-                                myJob.setPlanDate(date);
-                            }
-                        }
                         myJob.setSuccessNum(myJob.getSuccessNum()+1);
+                        //计算下次时间
+                        countPlanDate(myJob);
                         myJobMapper.insertMyJob(myJob);
                         myJobMapper.updateMyJobAndStatusFail(myJobDetail.getJobId());
                     }else{
                         map.put("sendIndex",sendIndex+1);
                         String parmsString =JSON.toJSONString(map);
+                        MyJob myJob = myJobMapper.selectJobById(myJobDetail.getJobId());
+                        //计算下次时间
+                        countPlanDate(myJob);
                         myJobMapper.updateMyJobMessageGroup(parmsString,myJobDetail.getJobId());
                         myJobMapper.updateMyJobFail(myJobDetail.getJobId());
                     }
@@ -125,27 +113,13 @@ public class sendMessageContactRunnable implements Runnable {
                         map.put("sendIndex",0);
                         String parmsString =JSON.toJSONString(map);
                         MyJob myJob = myJobMapper.selectJobById(myJobDetail.getJobId());
-                        myJob.setParms(parmsString);
-                        //计算下次时间
-                        if(messageGroupList.size()==sendIndex+1){
-                            String intervalLoop = myJob.getIntervalLoop();
-                            int intervalLoopUnit = myJob.getIntervalLoopUnit();
-                            Date nowDate = DateUtils.getNowDate();
-                            if(intervalLoopUnit==1){
-                                //循环间隔为分钟
-                                Date date = DateUtils.addMinutes(nowDate, Integer.valueOf(intervalLoop));
-                                myJob.setPlanDate(date);
-                            }else if(intervalLoopUnit==2){
-                                //循环间隔为小时
-                                Date date = DateUtils.addHours(nowDate, Integer.valueOf(intervalLoop));
-                                myJob.setPlanDate(date);
-                            }
-                        }
-                        myJobMapper.insertMyJob(myJob);
+                        countPlanDate(myJob);
                         myJobMapper.updateMyJobAndStatusFail(myJobDetail.getJobId());
                     }else{
                         map.put("sendIndex",sendIndex+1);
                         String parmsString =JSON.toJSONString(map);
+                        MyJob myJob = myJobMapper.selectJobById(myJobDetail.getJobId());
+                        countPlanDate(myJob);
                         myJobMapper.updateMyJobMessageGroup(parmsString,myJobDetail.getJobId());
                         myJobMapper.updateMyJobFail(myJobDetail.getJobId());
                     }
@@ -161,5 +135,26 @@ public class sendMessageContactRunnable implements Runnable {
             myJobMapper.insertMyJobDetail(myJobDetail);
             log.info("发送信息发生错误，错误原因{}",e.fillInStackTrace());
         }
+    }
+
+    //计算下次循环时间
+    private void countPlanDate(MyJob myJob){
+        //计算下次时间
+        if(StringUtils.equals(myJob.getJobType(),"2")){
+            String intervalLoop = myJob.getIntervalLoop();
+            int intervalLoopUnit = myJob.getIntervalLoopUnit();
+            Date nowDate = DateUtils.getNowDate();
+            if(intervalLoopUnit==1){
+                //循环间隔为分钟
+                Date date = DateUtils.addMinutes(nowDate, Integer.valueOf(intervalLoop));
+                myJob.setPlanDate(date);
+            }else if(intervalLoopUnit==2){
+                //循环间隔为小时
+                Date date = DateUtils.addHours(nowDate, Integer.valueOf(intervalLoop));
+                myJob.setPlanDate(date);
+            }
+        }
+        myJobMapper.insertMyJob(myJob);
+
     }
 }

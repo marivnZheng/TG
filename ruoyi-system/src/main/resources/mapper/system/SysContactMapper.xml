@@ -86,6 +86,11 @@
         delete from sys_contact where sys_contact_id = #{sysContactId}
     </delete>
 
+    <delete id="deleteSysContactByAccountId" parameterType="Long">
+        delete from sys_contact where sys_account_id = #{accountId}
+    </delete>
+
+
     <delete id="deleteSysContactBySysContactIds" parameterType="String">
         delete from sys_contact where sys_contact_id in
         <foreach item="sysContactId" collection="array" open="(" separator="," close=")">

@@ -27,7 +27,7 @@ public interface ISysAccountService
     public SysAccount selectSysAccountBySysAccountId(Long sysAccountId);
 
 
-    public AjaxResult virefyUser();
+
     /**
      * 查询列表
      * 
@@ -67,6 +67,8 @@ public interface ISysAccountService
 
     public TgLogin sendPhoneCode(String phoneNumber) throws InterruptedException, IOException;
 
+
+    public AjaxResult checkPhoneAndUserJurisdiction(String phoneNumber);
 
     public AjaxResult loginAccountByPhoneCode(TgLogin tgLogin) throws InterruptedException, IOException;
 
