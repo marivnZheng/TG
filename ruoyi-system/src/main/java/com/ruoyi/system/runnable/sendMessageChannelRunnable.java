@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class sendMessageChannelRunnable implements Runnable {
@@ -26,12 +27,16 @@ public class sendMessageChannelRunnable implements Runnable {
 
     private boolean lastFlag;
 
-    public sendMessageChannelRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper, Boolean lastFlag) {
+    private MyJob myJob;
+
+    public sendMessageChannelRunnable(String parms,MyJobDetail myJobDetail,MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob) {
         this.parms = parms;
         this.myJobDetail=myJobDetail;
         this.myJobMapper=myJobMapper;
         this.lastFlag=lastFlag;
+        this.myJob=myJob;
     }
+
 
     public sendMessageChannelRunnable() {
 
@@ -65,6 +70,7 @@ public class sendMessageChannelRunnable implements Runnable {
 
             Map resultMap = JSON.parseObject(result, Map.class);
             if(resultMap.get("code").equals("200")){
+                waitTask();
                 myJobDetail.setJobDetailDate(DateUtils.getNowDate());
                 myJobDetail.setJobDetailStatus(0);
                 if(lastFlag){
@@ -75,21 +81,7 @@ public class sendMessageChannelRunnable implements Runnable {
                         String parmsString =JSON.toJSONString(map);
                         MyJob myJob = myJobMapper.selectJobById(myJobDetail.getJobId());
                         myJob.setParms(parmsString);
-                        //计算下次时间
-                        if(myJob.getJobType()=="0"){
-                            String intervalLoop = myJob.getIntervalLoop();
-                            int intervalLoopUnit = myJob.getIntervalLoopUnit();
-                            Date nowDate = DateUtils.getNowDate();
-                            if(intervalLoopUnit==1){
-                                //循环间隔为分钟
-                                Date date = DateUtils.addMinutes(nowDate, Integer.valueOf(intervalLoop));
-                                myJob.setPlanDate(date);
-                            }else if(intervalLoopUnit==2){
-                                //循环间隔为小时
-                                Date date = DateUtils.addHours(nowDate, Integer.valueOf(intervalLoop));
-                                myJob.setPlanDate(date);
-                            }
-                        }
+                        countPlanDate(myJob);
                         myJobMapper.insertMyJob(myJob);
                         myJobMapper.updateMyJobAndStatusFail(myJobDetail.getJobId());
                     }else{
@@ -104,6 +96,7 @@ public class sendMessageChannelRunnable implements Runnable {
                 myJobMapper.insertMyJobDetail(myJobDetail);
 
             }else{
+                waitTask();
                 myJobDetail.setJobDetailDate(DateUtils.getNowDate());
                 myJobDetail.setJobDetailStatus(1);
                 myJobDetail.setMsg((String) resultMap.get("msg"));
@@ -115,20 +108,7 @@ public class sendMessageChannelRunnable implements Runnable {
                         MyJob myJob = myJobMapper.selectJobById(myJobDetail.getJobId());
                         myJob.setParms(parmsString);
                         //计算下次时间
-                        if(myJob.getJobType()=="0"){
-                            String intervalLoop = myJob.getIntervalLoop();
-                            int intervalLoopUnit = myJob.getIntervalLoopUnit();
-                            Date nowDate = DateUtils.getNowDate();
-                            if(intervalLoopUnit==1){
-                                //循环间隔为分钟
-                                Date date = DateUtils.addMinutes(nowDate, Integer.valueOf(intervalLoop));
-                                myJob.setPlanDate(date);
-                            }else if(intervalLoopUnit==2){
-                                //循环间隔为小时
-                                Date date = DateUtils.addHours(nowDate, Integer.valueOf(intervalLoop));
-                                myJob.setPlanDate(date);
-                            }
-                        }
+                        countPlanDate(myJob);
                         myJobMapper.insertMyJob(myJob);
                         myJobMapper.updateMyJobAndStatusFail(myJobDetail.getJobId());
                     }else{
@@ -143,11 +123,49 @@ public class sendMessageChannelRunnable implements Runnable {
                 myJobMapper.insertMyJobDetail(myJobDetail);
             }
         }catch (Exception e){
+            waitTask();
             myJobDetail.setJobDetailDate(DateUtils.getNowDate());
             myJobDetail.setJobDetailStatus(1);
             myJobDetail.setMsg("未知错误");
             myJobMapper.insertMyJobDetail(myJobDetail);
             log.error("发送信息到频道发生错误,任务详情id为{}",e.fillInStackTrace(),myJobDetail.getJobDetailId());
         }
+    }
+
+
+
+    private void waitTask(){
+        int  intervals=Integer.valueOf(myJob.getIntervals());
+        String intervalsUnit = String.valueOf(myJob.getIntervalsUnit()) ;
+        try {
+            if(intervalsUnit.equals("0")){
+                TimeUnit.SECONDS.sleep(intervals);
+            }else{
+                TimeUnit.MINUTES.sleep(intervals);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+    //计算下次循环时间
+    private void countPlanDate(MyJob myJob){
+        //计算下次时间
+        if(StringUtils.equals(myJob.getJobType(),"2")){
+            String intervalLoop = myJob.getIntervalLoop();
+            int intervalLoopUnit = myJob.getIntervalLoopUnit();
+            Date nowDate = DateUtils.getNowDate();
+            if(intervalLoopUnit==1){
+                //循环间隔为分钟
+                Date date = DateUtils.addMinutes(nowDate, Integer.valueOf(intervalLoop));
+                myJob.setPlanDate(date);
+            }else if(intervalLoopUnit==2){
+                //循环间隔为小时
+                Date date = DateUtils.addHours(nowDate, Integer.valueOf(intervalLoop));
+                myJob.setPlanDate(date);
+            }
+        }
+        myJobMapper.insertMyJob(myJob);
+
     }
 }

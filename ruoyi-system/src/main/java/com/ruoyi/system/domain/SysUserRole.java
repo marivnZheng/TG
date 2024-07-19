@@ -16,6 +16,8 @@ public class SysUserRole
     /** 角色ID */
     private Long roleId;
 
+    private Long accountDetailId;
+
     public Long getUserId()
     {
         return userId;
@@ -34,6 +36,14 @@ public class SysUserRole
     public void setRoleId(Long roleId)
     {
         this.roleId = roleId;
+    }
+
+    public Long getAccountDetailId() {
+        return accountDetailId;
+    }
+
+    public void setAccountDetailId(Long accountDetailId) {
+        this.accountDetailId = accountDetailId;
     }
 
     @Override

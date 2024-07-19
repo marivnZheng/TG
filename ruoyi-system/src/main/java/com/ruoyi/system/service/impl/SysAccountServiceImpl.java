@@ -18,6 +18,7 @@ import com.ruoyi.system.mapper.SysAccountMapper;
 import com.ruoyi.system.service.ISysAccountDetailService;
 import com.ruoyi.system.service.ISysAccountService;
 import com.ruoyi.system.util.TGUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.python.antlr.ast.Str;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
  * @author ruoyi
  * @date 2024-05-09
  */
+@Slf4j
 @Service
 public class SysAccountServiceImpl implements ISysAccountService 
 {
@@ -142,7 +144,7 @@ public class SysAccountServiceImpl implements ISysAccountService
         }
         List<SysAccount> sysAccounts = sysAccountMapper.selectSysAccountList(new SysAccount().setSysAccountPhone(phoneNumber));
         if(sysAccounts.size()>0){
-            String errorMsg= "改账号已经登入其它用户";
+            String errorMsg= "该账号已经登入其它用户";
             return  error(errorMsg);
         }
         return success();
@@ -291,7 +293,8 @@ public class SysAccountServiceImpl implements ISysAccountService
     @Override
     public AjaxResult sessionFileLogin(String jsonStr) throws InterruptedException, IOException {
         JSONArray objects = JSON.parseArray(jsonStr);
-        SysAccountDetail sysAccountDetail = sysAccountDetailService.selectAccountDetailByLeverId(getLoginUser().getUser().getUserId());
+        SysAccountDetail sysAccountDetail = sysAccountDetailService.selectAccountDetailByLeverId(getLoginUser().getUser().getAccountDetailId());
+        log.info("登入用户为：{}，最大登录数量为：{}",getLoginUser().getUser().getUserId(),sysAccountDetail.getAccountNum());
         int num = sysAccountMapper.selectCountUserId(getLoginUser().getUser().getUserId());
         if(sysAccountDetail.getAccountNum()<num+objects.size()){
             String errorMsg= "最大只能登入"+sysAccountDetail.getAccountNum();

@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
@@ -27,11 +28,14 @@ public class sendMessageContactRunnable implements Runnable {
 
     private boolean lastFlag;
 
-    public sendMessageContactRunnable(String parms,MyJobDetail myJobDetail,MyJobMapper myJobMapper,Boolean lastFlag) {
+    private MyJob myJob;
+
+    public sendMessageContactRunnable(String parms,MyJobDetail myJobDetail,MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob) {
         this.parms = parms;
         this.myJobDetail=myJobDetail;
         this.myJobMapper=myJobMapper;
         this.lastFlag=lastFlag;
+        this.myJob=myJob;
     }
 
     public sendMessageContactRunnable() {
@@ -67,9 +71,11 @@ public class sendMessageContactRunnable implements Runnable {
 
             String s = result.replaceAll("\\\\", "_");
             if(!TGUtil.isJsonString(s)){
+                log.info("执行结果为：{}",result);
                 myJobDetail.setJobDetailDate(DateUtils.getNowDate());
                 myJobDetail.setJobDetailStatus(1);
                 myJobDetail.setMsg("未知错误");
+                waitTask();
                 myJobMapper.insertMyJobDetail(myJobDetail);
                 return;
             }
@@ -77,6 +83,7 @@ public class sendMessageContactRunnable implements Runnable {
             if(resultMap.get("code").equals("200")){
                 myJobDetail.setJobDetailDate(DateUtils.getNowDate());
                 myJobDetail.setJobDetailStatus(0);
+                waitTask();
                 if(lastFlag){
                     //最后一组数据
                     if(messageGroupList.size()==sendIndex+1){
@@ -107,6 +114,7 @@ public class sendMessageContactRunnable implements Runnable {
                 myJobDetail.setJobDetailDate(DateUtils.getNowDate());
                 myJobDetail.setJobDetailStatus(1);
                 myJobDetail.setMsg((String) resultMap.get("msg"));
+                waitTask();
                 if(lastFlag){         //最后一组数据
                     if(messageGroupList.size()==sendIndex+1){
                         //判断是否循环，设置下次进行计划时间
@@ -129,12 +137,29 @@ public class sendMessageContactRunnable implements Runnable {
                 myJobMapper.insertMyJobDetail(myJobDetail);
             }
         }catch (Exception e){
+            waitTask();
             myJobDetail.setJobDetailDate(DateUtils.getNowDate());
             myJobDetail.setJobDetailStatus(1);
             myJobDetail.setMsg("未知错误");
             myJobMapper.insertMyJobDetail(myJobDetail);
-            log.info("发送信息发生错误，错误原因{}",e.fillInStackTrace());
+            log.error("发送信息发生错误，错误原因{}",e.fillInStackTrace());
         }
+    }
+
+
+    private void waitTask(){
+        int  intervals=Integer.valueOf(myJob.getIntervals());
+        String intervalsUnit = String.valueOf(myJob.getIntervalsUnit()) ;
+            try {
+                if(intervalsUnit.equals("0")){
+                    TimeUnit.SECONDS.sleep(intervals);
+                }else{
+                    TimeUnit.MINUTES.sleep(intervals);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
     }
 
     //计算下次循环时间

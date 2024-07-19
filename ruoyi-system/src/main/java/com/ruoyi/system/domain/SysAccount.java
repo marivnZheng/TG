@@ -76,11 +76,11 @@ public class SysAccount extends BaseEntity
     @Excel(name = "账号新增时间时区")
     private String sysAccountCreateTimezone;
 
-    private int sysAccountOnline;
+    private Long sysAccountOnline;
 
     private String sysAccountAbout;
 
-    private int sysAccountLoginStatus;
+    private Long sysAccountLoginStatus;
 
 
 }

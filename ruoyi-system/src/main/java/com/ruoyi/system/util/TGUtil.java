@@ -105,6 +105,7 @@ public class TGUtil {
     }
 
     public String login(String cmd,String key) throws InterruptedException, IOException {
+        log.info(cmd);
         redisCache.setCacheObject(key,"",60,TimeUnit.SECONDS);
         Process p = null;
         try {

@@ -78,6 +78,8 @@ public class SysRegisterService
         {
             sysUser.setNickName(username);
             sysUser.setPassword(SecurityUtils.encryptPassword(password));
+            sysUser.setAccountDetailId(1L);
+            sysUser.setVipDate(0L);
             boolean regFlag = userService.registerUser(sysUser);
             if (!regFlag)
             {
@@ -87,8 +89,7 @@ public class SysRegisterService
             {
                 //给用户添加默认角色
                 Long[] useIds= {sysUser.getUserId()};
-
-                sysRoleService.insertAuthUsers(2l,useIds);
+                sysRoleService.insertAuthUsers(2L,useIds);
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.REGISTER, MessageUtils.message("user.register.success")));
             }
         }

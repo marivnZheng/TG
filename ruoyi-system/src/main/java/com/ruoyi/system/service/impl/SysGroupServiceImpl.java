@@ -210,7 +210,7 @@ public class SysGroupServiceImpl implements ISysGroupService
                 jobDetail.setJobDetailStatus(-1);
                 jobDetail.setTaskClass("com.ruoyi.system.runnable.InvoteGroupRunnable");
                 jobDetail.setIndex(index);
-                jobDetail.setTarg((String) contact.getSysContactUserName());
+                jobDetail.setTarg(contact.getSysContactUserName());
                 myJobDetails.add(jobDetail);
                 index++;
             }
@@ -245,9 +245,65 @@ public class SysGroupServiceImpl implements ISysGroupService
         Integer onceTime =Integer.valueOf((String)map.get("onceTime"));
         Integer loopTime =  Integer.valueOf((String) map.get("loopTime"));
         List<SysAccount> sysAccounts = sysAccountMapper.selectByStrings(accountList);
-        ExecutorService executor = Executors.newCachedThreadPool() ;
-        JoinGroupRunnable runnable = new JoinGroupRunnable(sysAccounts,groupLink,onceTime,loopTime,myJobMapper,getLoginUser().getUserId());
-        executor.execute(runnable);
+        int index =0;
+        Long userId= getLoginUser().getUserId();
+        String[] split = groupLink.split("\n");
+        List<String> linkList = new ArrayList<>();
+        for (String s : split) {
+            String[] groupLinks = s.split(",");
+            for (String link : groupLinks) {
+                linkList.add(link);
+            }
+        }
+        HashMap parsm = new HashMap();
+        if(linkList.size()>1){
+            HashMap jobIds = new HashMap();
+            for (SysAccount account :sysAccounts){
+                MyJob job = new MyJob();
+                job.setTarNum(linkList.size());
+                job.setJobType("1");
+                job.setJobName("群链接添加群组");
+                job.setIntervals(onceTime+"");
+                job.setIntervalsUnit(1);
+                parsm.put("sessionString",account.getSysAccountStringSession());
+                job.setCreateDate(DateUtils.getNowDate());
+                job.setUserId(userId);
+                job.setParms(JSON.toJSONString(parsm));
+                String name = account.getSysAccountFirstName()+" " +account.getSysAccountLastName();
+                job.setSysAccountName(name);
+                myJobMapper.insertMyJob(job);
+                ArrayList list = new ArrayList();
+                jobIds.put(account.getSysAccountId(),job.getJobId());
+                for (String link : linkList) {
+                    MyJobDetail jobDetail = new MyJobDetail();
+                    jobDetail.setTarg(link);
+                    jobDetail.setIndex(index);
+                    jobDetail.setJobId(job.getJobId());
+                    jobDetail.setTaskClass("com.ruoyi.system.runnable.JoinGroupRunnable");
+                    jobDetail.setJobDetailStatus(-1);
+                    list.add(jobDetail);
+                    index++;
+                }
+                List<List<MyJobDetail>> partition = ListUtil.partition(list, 100);
+                partition.forEach(e -> myJobMapper.batchMyJobDetail(e));
+            }
+
+        }
+        else{
+            for (String link : linkList) {
+                for (SysAccount account : sysAccounts) {
+                    HashMap parms = new HashMap();
+                    try {
+                        parms.put("sessionString",account.getSysAccountStringSession());
+                        parms.put("link",link);
+                        tgUtil.GenerateCommand("joinGroup", parms);
+                        Thread.sleep(1000*loopTime*60);
+                    } catch (InterruptedException | IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
         return success();
     }
 

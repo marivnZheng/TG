@@ -7,36 +7,37 @@ import com.ruoyi.common.domain.MyJobDetail;
 import com.ruoyi.common.mapper.MyJobMapper;
 import com.ruoyi.common.utils.DateUtils;
 
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysAccount;
 import com.ruoyi.system.util.TGUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class JoinGroupRunnable implements Runnable {
 
-    private List<SysAccount> accountList;
+    private String parms;
 
-    private String groupLink;
-
-    private Integer onceTime;
-
-    private Integer loopTime;
+    private MyJobDetail myJobDetail;
 
     private MyJobMapper myJobMapper;
 
-    private Long userId;
+    private boolean lastFlag;
 
-    public JoinGroupRunnable(List<SysAccount> accountList, String groupLink, Integer onceTime, Integer loopTime,MyJobMapper myJobMapper,Long userId) {
-        this.accountList = accountList;
-        this.groupLink = groupLink;
-        this.onceTime = onceTime;
-        this.loopTime = loopTime;
+    private MyJob myJob;
+
+    public JoinGroupRunnable(String parms,MyJobDetail myJobDetail,MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob) {
+        this.parms = parms;
+        this.myJobDetail=myJobDetail;
         this.myJobMapper=myJobMapper;
-        this.userId=userId;
+        this.lastFlag=lastFlag;
+        this.myJob=myJob;
     }
 
     public JoinGroupRunnable() {
@@ -45,109 +46,62 @@ public class JoinGroupRunnable implements Runnable {
     @Override
     public void run() {
         TGUtil tgUtil = new TGUtil();
-        String[] split = groupLink.split("\n");
-        List<String> linkList = new ArrayList<>();
-        for (String s : split) {
-            String[] groupLinks = s.split(",");
-            for (String link : groupLinks) {
-                linkList.add(link);
+        HashMap map = JSON.parseObject(parms, HashMap.class);
+        try {
+            map.put("link", StringUtils.isNotEmpty(myJobDetail.getTarg())?myJobDetail.getTarg():myJobDetail.getTargId());
+            String result=tgUtil.GenerateCommand("joinGroup",map);
+            String s = result.replaceAll("\\\\", "_");
+            if(!TGUtil.isJsonString(s)){
+                myJobDetail.setJobDetailDate(DateUtils.getNowDate());
+                waitTask();
+                myJobDetail.setJobDetailStatus(1);
+                myJobDetail.setMsg("未知错误");
+                myJobMapper.insertMyJobDetail(myJobDetail);
+                return;
             }
-        }
-        HashMap parsm = new HashMap();
-        parsm.put("accountList",accountList);
-        parsm.put("groupLink",groupLink);
-        parsm.put("onceTime",onceTime);
-        parsm.put("loopTime",loopTime);
-        int count =0;
-        if(linkList.size()>1){
-            HashMap jobIds = new HashMap();
-            for (SysAccount account :accountList){
-                MyJob job = new MyJob();
-                job.setTarNum(linkList.size());
-                job.setJobType("1");
-                job.setJobName("群链接添加群组");
-                job.setJobClass("JoinGroupRunnable");
-                job.setIntervals(onceTime+"");
-                job.setIntervalsUnit(1);
-                job.setCreateDate(DateUtils.getNowDate());
-                job.setUserId(userId);
-                job.setParms(JSON.toJSONString(parsm));
-                String name = account.getSysAccountFirstName()+" " +account.getSysAccountLastName();
-                job.setSysAccountName(name);
-                myJobMapper.insertMyJob(job);
-                jobIds.put(account.getSysAccountId(),job.getJobId());
+            Map resultMap = JSON.parseObject(s, Map.class);
+            if(resultMap.get("code").equals("200")){
+                myJobDetail.setJobDetailDate(DateUtils.getNowDate());
+                waitTask();
+                myJobDetail.setJobDetailStatus(0);
+                myJobMapper.updateMyJob(myJobDetail.getJobId());
+                myJobMapper.insertMyJobDetail(myJobDetail);
+            }else{
+                myJobDetail.setJobDetailDate(DateUtils.getNowDate());
+                waitTask();
+                myJobDetail.setJobDetailStatus(1);
+                myJobDetail.setMsg((String) resultMap.get("msg"));
+                myJobMapper.updateMyJobFail(myJobDetail.getJobId());
+                myJobMapper.insertMyJobDetail(myJobDetail);
             }
-            for (String link : linkList) {
-                count++;
-                for (SysAccount sysAccount :accountList){
-                    HashMap tgParms= new HashMap();
-                    tgParms.put("link",link);
-                    tgParms.put("sessionString",sysAccount.getSysAccountStringSession());
-                    try {
-                        String joinGroup = tgUtil.GenerateCommand("joinGroup", tgParms);
-                        Map map = JSON.parseObject(joinGroup, Map.class);
-                        if(map.get("code").equals("200")){
-                            MyJobDetail jobDetail = new MyJobDetail();
-                            long jobId = (Long) jobIds.get(sysAccount.getSysAccountId());
-                            jobDetail.setJobId(jobId);
-                            jobDetail.setTarg(link.substring(link.lastIndexOf("/")+1));
-                            jobDetail.setJobDetailDate(DateUtils.getNowDate());
-                            jobDetail.setJobDetailStatus(0);
-                            if(count==linkList.size()){
-                                myJobMapper.updateMyJobAndStatus(jobId);
-                            }else{
-                                myJobMapper.updateMyJob(jobId);
-                            }
-
-                            myJobMapper.insertMyJobDetail(jobDetail);
-                        }else{
-                            MyJobDetail jobDetail = new MyJobDetail();
-                            long jobId = (Long) jobIds.get(sysAccount.getSysAccountId());
-                            jobDetail.setJobId(jobId);
-                            jobDetail.setJobDetailDate(DateUtils.getNowDate());
-                            jobDetail.setJobDetailStatus(1);
-                            jobDetail.setMsg((String) map.get("msg"));
-                            if(count==linkList.size()){
-                                myJobMapper.updateMyJobAndStatusFail(jobId);
-                            }else{
-                                myJobMapper.updateMyJobFail(jobId);
-                            }
-                            myJobMapper.insertMyJobDetail(jobDetail);
-                        }
-                        Thread.sleep(loopTime*1000*60);
-                    } catch (InterruptedException | IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                try {
-                    Thread.sleep(loopTime*1000*60);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }else{
-            for (String link : linkList) {
-                for (SysAccount account : accountList) {
-                    HashMap parms = new HashMap();
-                    try {
-                        parms.put("sessionString",account.getSysAccountStringSession());
-                        parms.put("link",link);
-                        tgUtil.GenerateCommand("joinGroup", parms);
-                        Thread.sleep(1000*loopTime*60);
-                    } catch (InterruptedException | IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-
-
-            }
+        }catch (Exception e){
+            myJobDetail.setJobDetailDate(DateUtils.getNowDate());
+            waitTask();
+            myJobDetail.setJobDetailStatus(1);
+            myJobDetail.setMsg("未知错误");
+            myJobDetail.setJobDetailDate(DateUtils.getNowDate());
+            myJobMapper.insertMyJobDetail(myJobDetail);
+            log.error("发送信息发生错误，错误原因{}",e.fillInStackTrace());
 
         }
 
 
+        }
 
+    private void waitTask(){
+        int  intervals=Integer.valueOf(myJob.getIntervals());
+        String intervalsUnit = String.valueOf(myJob.getIntervalsUnit()) ;
+        try {
+            if(intervalsUnit.equals("0")){
+                TimeUnit.SECONDS.sleep(intervals);
+            }else{
+                TimeUnit.MINUTES.sleep(intervals);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 }
 

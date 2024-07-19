@@ -8,6 +8,7 @@ import com.ruoyi.common.mapper.MyJobMapper;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SysTaskMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
+@Slf4j
 @Configuration
 @EnableScheduling
 public class TgTaskConsumer{
@@ -55,8 +57,8 @@ public class TgTaskConsumer{
                                         String endTime = (String) map.get("endTime");
                                         String endDate = (String) map.get("endDate");
                                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                                        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                                         //存在结束时间
+                                        log.info("startTime:{},endTime:{},endDate:{},nowDate:{}",startTime,endTime,endDate,DateUtils.getNowDate().getTime());
                                         if(!StringUtils.isEmpty(endDate)){
                                                 if(dateFormat.parse(endDate).getTime()-DateUtils.getNowDate().getTime()<0){
                                                         //设置不在循环
@@ -95,24 +97,8 @@ public class TgTaskConsumer{
                                         if(myJobDetail.getJobDetailStatus()!=-2){
                                                 myJobDetail.setJobDetailStatus(-2);
                                                 myJobMapper.insertMyJobDetail(myJobDetail);
-                                                Class<?> runnable = Class.forName(myJobDetail.getTaskClass());
-                                                Class[] parameterTypes={String.class,MyJobDetail.class, MyJobMapper.class,Boolean.class};
-                                                boolean flag = false;
-
-                                                if((myJobDetail.getIndex()+1) % myJob.getTarNum() == 0) {
-                                                        flag=true;
-                                                }
-                                                Constructor<?> constructors = runnable.getConstructor(parameterTypes);
-                                                Object[] parameters={parms,myJobDetail,myJobMapper,flag};
-                                                Runnable o =(Runnable) constructors.newInstance(parameters);
-                                                executor.execute(o);
-                                                int  intervals=Integer.valueOf(myJob.getIntervals());
-                                                String intervalsUnit = String.valueOf(myJob.getIntervalsUnit()) ;
-                                                if(intervalsUnit.equals("0")){
-                                                        TimeUnit.SECONDS.sleep(intervals);
-                                                }else{
-                                                        TimeUnit.MINUTES.sleep(intervals);
-                                                }
+                                                log.info("执行任务类型为：{}",myJobDetail.getTaskClass());
+                                                exec(parms,myJobDetail,myJob);
                                         }
                                 }
 
@@ -123,24 +109,8 @@ public class TgTaskConsumer{
                                         if(myJobDetail.getJobDetailStatus()!=-2){
                                                 myJobDetail.setJobDetailStatus(-2);
                                                 myJobMapper.insertMyJobDetail(myJobDetail);
-                                                Class<?> runnable = Class.forName(myJobDetail.getTaskClass());
-                                                Class[] parameterTypes={String.class,MyJobDetail.class, MyJobMapper.class,Boolean.class};
-                                                boolean flag = false;
-
-                                                if((myJobDetail.getIndex()+1) % myJob.getTarNum() == 0) {
-                                                        flag=true;
-                                                }
-                                                Constructor<?> constructors = runnable.getConstructor(parameterTypes);
-                                                Object[] parameters={parms,myJobDetail,myJobMapper,flag};
-                                                Runnable o =(Runnable) constructors.newInstance(parameters);
-                                                executor.execute(o);
-                                                int  intervals=Integer.valueOf(myJob.getIntervals());
-                                                String intervalsUnit = String.valueOf(myJob.getIntervalsUnit()) ;
-                                                if(intervalsUnit.equals("0")){
-                                                        TimeUnit.SECONDS.sleep(intervals);
-                                                }else{
-                                                        TimeUnit.MINUTES.sleep(intervals);
-                                                }
+                                                log.info("执行任务类型为：{}",myJobDetail.getTaskClass());
+                                                exec(parms,myJobDetail,myJob);
                                         }
                                 }else{
                                         myJob.setJobStatus("3");
@@ -151,6 +121,20 @@ public class TgTaskConsumer{
 
                 }
         }
+
+        public  void exec(String parms,MyJobDetail myJobDetail,MyJob myJob) throws IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException, NoSuchMethodException {
+
+                        Class<?>runnable = Class.forName(myJobDetail.getTaskClass());
+                        Class[] parameterTypes={String.class,MyJobDetail.class, MyJobMapper.class,Boolean.class,MyJob.class};
+                        boolean flag = false;
+                        if((myJobDetail.getIndex()+1) % myJob.getTarNum() == 0) {
+                                flag=true;
+                        }
+                        Constructor<?> constructors = runnable.getConstructor(parameterTypes);
+                        Object[] parameters={parms,myJobDetail,myJobMapper,flag,myJob};
+                        Runnable o =(Runnable) constructors.newInstance(parameters);
+                        executor.execute(o);
+        };
         public static boolean isEffectiveDate(Date nowTime, Date startTime, Date endTime) {
                 if (nowTime.getTime() == startTime.getTime()
                         || nowTime.getTime() == endTime.getTime()) {
