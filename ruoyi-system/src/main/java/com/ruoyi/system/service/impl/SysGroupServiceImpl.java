@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.SysGroupMapper;
 import com.ruoyi.system.domain.SysGroup;
 import com.ruoyi.system.service.ISysGroupService;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.ruoyi.common.core.domain.AjaxResult.success;
 import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
@@ -239,11 +240,13 @@ public class SysGroupServiceImpl implements ISysGroupService
     }
 
     @Override
+    @Transactional
     public AjaxResult inviteGroupList(HashMap map) {
         List<String> accountList = (List<String>) map.get("accountList");
         String groupLink = (String) map.get("groupLink");
         Integer onceTime =Integer.valueOf((String)map.get("onceTime"));
         Integer loopTime =  Integer.valueOf((String) map.get("loopTime"));
+        String addMethod = (String) map.get("addMethod");
         List<SysAccount> sysAccounts = sysAccountMapper.selectByStrings(accountList);
         int index =0;
         Long userId= getLoginUser().getUserId();
@@ -257,37 +260,88 @@ public class SysGroupServiceImpl implements ISysGroupService
         }
         HashMap parsm = new HashMap();
         if(linkList.size()>1){
-            HashMap jobIds = new HashMap();
-            for (SysAccount account :sysAccounts){
-                MyJob job = new MyJob();
-                job.setTarNum(linkList.size());
-                job.setJobType("1");
-                job.setJobName("群链接添加群组");
-                job.setIntervals(onceTime+"");
-                job.setIntervalsUnit(1);
-                parsm.put("sessionString",account.getSysAccountStringSession());
-                job.setCreateDate(DateUtils.getNowDate());
-                job.setUserId(userId);
-                job.setParms(JSON.toJSONString(parsm));
-                String name = account.getSysAccountFirstName()+" " +account.getSysAccountLastName();
-                job.setSysAccountName(name);
-                myJobMapper.insertMyJob(job);
-                ArrayList list = new ArrayList();
-                jobIds.put(account.getSysAccountId(),job.getJobId());
-                for (String link : linkList) {
-                    MyJobDetail jobDetail = new MyJobDetail();
-                    jobDetail.setTarg(link);
-                    jobDetail.setIndex(index);
-                    jobDetail.setJobId(job.getJobId());
-                    jobDetail.setTaskClass("com.ruoyi.system.runnable.JoinGroupRunnable");
-                    jobDetail.setJobDetailStatus(-1);
-                    list.add(jobDetail);
-                    index++;
+            if(StringUtils.equals(addMethod,"1")){
+                HashMap jobIds = new HashMap();
+                for (SysAccount account :sysAccounts){
+                    MyJob job = new MyJob();
+                    job.setTarNum(linkList.size());
+                    job.setJobType("1");
+                    job.setJobName("群链接添加群组");
+                    job.setIntervals(onceTime+"");
+                    job.setIntervalsUnit(1);
+                    parsm.put("sessionString",account.getSysAccountStringSession());
+                    job.setCreateDate(DateUtils.getNowDate());
+                    job.setUserId(userId);
+                    job.setParms(JSON.toJSONString(parsm));
+                    String name = account.getSysAccountFirstName()+" " +account.getSysAccountLastName();
+                    job.setSysAccountName(name);
+                    myJobMapper.insertMyJob(job);
+                    ArrayList list = new ArrayList();
+                    jobIds.put(account.getSysAccountId(),job.getJobId());
+                    for (String link : linkList) {
+                        MyJobDetail jobDetail = new MyJobDetail();
+                        jobDetail.setTarg(link);
+                        jobDetail.setIndex(index);
+                        jobDetail.setJobId(job.getJobId());
+                        jobDetail.setTaskClass("com.ruoyi.system.runnable.JoinGroupRunnable");
+                        jobDetail.setJobDetailStatus(-1);
+                        list.add(jobDetail);
+                        index++;
+                    }
+                    List<List<MyJobDetail>> partition = ListUtil.partition(list, 100);
+                    partition.forEach(e -> myJobMapper.batchMyJobDetail(e));
                 }
-                List<List<MyJobDetail>> partition = ListUtil.partition(list, 100);
-                partition.forEach(e -> myJobMapper.batchMyJobDetail(e));
+            }else if(StringUtils.equals(addMethod,"2")){
+                    //平分
+                Map<Long, List<String>> sysAccountMap = new HashMap<>();
+                int mapIndex =0;
+                for (String link:linkList){
+                    SysAccount sysAccount = sysAccounts.get(mapIndex);
+                    if (sysAccountMap.containsKey(sysAccount.getSysAccountId())) {
+                        List<String> list =  sysAccountMap.get(sysAccount.getSysAccountId());
+                        list.add(link);
+                    } else {
+                        List<String> list = new ArrayList<>();
+                        list.add(link);
+                        sysAccountMap.put(sysAccount.getSysAccountId(), list);
+                    }
+                    mapIndex++;
+                    if(mapIndex==sysAccounts.size()){
+                        mapIndex=0;
+                    }
+                }
+                HashMap jobIds = new HashMap();
+                for (SysAccount account :sysAccounts){
+                    List<String> accountLinkList = sysAccountMap.get(account.getSysAccountId());
+                    MyJob job = new MyJob();
+                    job.setTarNum(accountLinkList.size());
+                    job.setJobType("1");
+                    job.setJobName("群链接添加群组");
+                    job.setIntervals(onceTime+"");
+                    job.setIntervalsUnit(1);
+                    parsm.put("sessionString",account.getSysAccountStringSession());
+                    job.setCreateDate(DateUtils.getNowDate());
+                    job.setUserId(userId);
+                    job.setParms(JSON.toJSONString(parsm));
+                    String name = account.getSysAccountFirstName()+" " +account.getSysAccountLastName();
+                    job.setSysAccountName(name);
+                    myJobMapper.insertMyJob(job);
+                    ArrayList list = new ArrayList();
+                    jobIds.put(account.getSysAccountId(),job.getJobId());
+                    for (String link : accountLinkList) {
+                        MyJobDetail jobDetail = new MyJobDetail();
+                        jobDetail.setTarg(link);
+                        jobDetail.setIndex(index);
+                        jobDetail.setJobId(job.getJobId());
+                        jobDetail.setTaskClass("com.ruoyi.system.runnable.JoinGroupRunnable");
+                        jobDetail.setJobDetailStatus(-1);
+                        list.add(jobDetail);
+                        index++;
+                    }
+                    List<List<MyJobDetail>> partition = ListUtil.partition(list, 100);
+                    partition.forEach(e -> myJobMapper.batchMyJobDetail(e));
+                }
             }
-
         }
         else{
             for (String link : linkList) {

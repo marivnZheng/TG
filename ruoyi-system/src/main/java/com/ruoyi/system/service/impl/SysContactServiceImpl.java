@@ -140,8 +140,8 @@ public class SysContactServiceImpl implements ISysContactService {
                 job.setJobType("1");
                 job.setJobName("用户名添加好友");
                 job.setJobClass("com.ruoyi.system.runnable.addContactRunnable");
-                job.setIntervals(3+"");
-                job.setIntervalsUnit(0);
+                job.setIntervals(Contact.getMinCount()+"");
+                job.setIntervalsUnit(Integer.valueOf(Contact.getMin().toString()));
                 job.setJobGroup(String.valueOf(date));
                 job.setCreateDate(DateUtils.getNowDate());
                 job.setParms(JSON.toJSONString(parms));
@@ -228,8 +228,8 @@ public class SysContactServiceImpl implements ISysContactService {
                 job.setJobType("1");
                 job.setJobName("用户名添加好友");
                 job.setJobClass("com.ruoyi.system.runnable.addContactPhoneRunnable");
-                job.setIntervals(3+"");
-                job.setIntervalsUnit(0);
+                job.setIntervals(Contact.getMinCount()+"");
+                job.setIntervalsUnit(Integer.valueOf(Contact.getMin().toString()));
                 job.setJobGroup(String.valueOf(date));
                 job.setCreateDate(DateUtils.getNowDate());
                 job.setParms(JSON.toJSONString(parms));

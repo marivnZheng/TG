@@ -87,17 +87,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<update id="updateMyJob" parameterType="long" >
 		update my_job a set a.succes_num=a.succes_num+1,a.job_status='2'
-		where job_id =#{jobId}
+		where job_id =#{jobId} and a.job_status !=0
 	</update>
 
 
 	<update id="updateMyJobFail" parameterType="long" >
 		update my_job a set a.succes_num=a.succes_num,a.job_status='2'
-		where job_id =#{jobId}
+		where job_id =#{jobId} and a.job_status !='0'
 	</update>
 
 	<update id="updateMyJobAndStatus" parameterType="long" >
-		update my_job a set a.succes_num=a.succes_num+1,a.job_status=3  where job_id =#{jobId}
+		update my_job a set a.succes_num=a.succes_num+1,a.job_status=3  where job_id =#{jobId} and a.job_status !=0
+	</update>
+
+
+	<update id="updateStatus"  >
+		update my_job_detail a set a.my_job_detail_status=-2 ,a.my_job_detail_next_plan_date=#{nextPlanDate}   where my_job_detail_id =#{jobDetailId}
 	</update>
 
 	<update id="updateMyJobMessageGroup">
@@ -105,7 +110,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</update>
 
 	<update id="updateMyJobAndStatusFail" parameterType="long" >
-		update my_job a set a.succes_num=a.succes_num,a.job_status=3  where job_id =#{jobId}
+		update my_job a set a.succes_num=a.succes_num,a.job_status=3  where job_id =#{jobId} and a.job_status !=0
 	</update>
 
 	<select id="selectJobById" parameterType="Long" resultMap="SysTaskResult">

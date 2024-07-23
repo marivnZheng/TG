@@ -52,5 +52,8 @@ public class SysContact extends BaseEntity
 
     private List<String> sysAccountIds;
 
+    private int minCount;
+
+    private String min;
 
 }

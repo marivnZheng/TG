@@ -96,7 +96,7 @@ public class SysContactController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:contacts:export')")
     @Log(title = "", businessType = BusinessType.EXPORT)
-    @PostMapping("/export")
+    @PostMapping("/exportSyncConcat")
     public void export(HttpServletResponse response, SysContact sysContacts)
     {
         List<SysContact> list = sysContactsService.selectSysContactList(sysContacts);

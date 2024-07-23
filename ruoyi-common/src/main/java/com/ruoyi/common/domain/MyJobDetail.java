@@ -25,6 +25,16 @@ public class MyJobDetail implements Serializable {
 
     private  String taskClass;
 
+    private Date nextPlanDate;
+
+
+    public Date getNextPlanDate() {
+        return nextPlanDate;
+    }
+
+    public void setNextPlanDate(Date nextPlanDate) {
+        this.nextPlanDate = nextPlanDate;
+    }
 
     public int getIndex() {
         return index;

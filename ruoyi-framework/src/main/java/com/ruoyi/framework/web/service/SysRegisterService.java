@@ -1,12 +1,9 @@
 package com.ruoyi.framework.web.service;
 
-import com.ruoyi.system.mapper.SysRoleMapper;
-import com.ruoyi.system.service.ISysRoleService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.common.core.redis.RedisCache;
@@ -17,10 +14,18 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.manager.AsyncManager;
 import com.ruoyi.framework.manager.factory.AsyncFactory;
+import com.ruoyi.framework.util.MailUtil;
 import com.ruoyi.system.service.ISysConfigService;
+import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
+import org.aspectj.weaver.loadtime.Aj;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.util.Properties;
 
 /**
  * 注册校验方法
@@ -41,6 +46,9 @@ public class SysRegisterService
 
     @Autowired
     private ISysRoleService sysRoleService;
+
+    @Autowired
+    private  MailUtil mailUtil;
 
 
     /**
@@ -95,6 +103,11 @@ public class SysRegisterService
         }
         return msg;
     }
+
+    public AjaxResult sendMailGetCode(RegisterBody registerBody){
+        return mailUtil.sendMailGetCode(registerBody.getEmail());
+    }
+
 
     /**
      * 校验验证码

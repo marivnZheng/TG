@@ -4,6 +4,7 @@ import com.ruoyi.common.domain.MyJob;
 import com.ruoyi.common.domain.MyJobDetail;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,4 +38,7 @@ public interface MyJobMapper
     public int batchMyJobDetail(List<MyJobDetail> list);
 
     public int insertMyJobDetail(MyJobDetail job);
+
+
+    public int updateStatus(@Param("status") int status, @Param("jobDetailId")Long jobDetailId, @Param("nextPlanDate")Date nextPlanDate);
 }

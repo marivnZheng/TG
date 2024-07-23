@@ -83,6 +83,8 @@
     <orderEntry type="library" name="Maven: org.python:jython-standalone:2.7.2" level="project" />
     <orderEntry type="library" name="Maven: cn.hutool:hutool-all:5.8.5" level="project" />
     <orderEntry type="library" name="Maven: org.python:jython:2.7.2" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.mail:javax.mail:1.6.2" level="project" />
+    <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
     <orderEntry type="module" module-name="ruoyi-quartz" />
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
     <orderEntry type="library" name="Maven: com.mchange:mchange-commons-java:0.2.15" level="project" />

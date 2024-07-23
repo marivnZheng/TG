@@ -70,7 +70,7 @@ public interface SysUserMapper
      */
     public int updateUser(SysUser user);
 
-    public int updateUserVipDate(Long userId,Long vipDate);
+    public int updateUserVipDate(@Param("userId")Long userId,@Param("vipDate") Long vipDate);
 
     public int updateUserVip(Long userId);
 

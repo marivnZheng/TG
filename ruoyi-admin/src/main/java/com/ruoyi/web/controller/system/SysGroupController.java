@@ -65,7 +65,7 @@ public class SysGroupController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:group:export')")
     @Log(title = "", businessType = BusinessType.EXPORT)
-    @PostMapping("/export")
+    @PostMapping("/exportGroup")
     public void export(HttpServletResponse response, SysGroup sysGroup)
     {
         List<SysGroup> list = sysGroupService.selectSysGroupList(sysGroup);

@@ -3,16 +3,7 @@ package com.ruoyi.quartz.service.impl;
 import java.util.*;
 import javax.annotation.PostConstruct;
 
-import com.alibaba.fastjson2.JSON;
-import com.ruoyi.common.domain.MyJobDetail;
-import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.domain.MyJob;
 import com.ruoyi.common.mapper.MyJobMapper;
-import com.ruoyi.quartz.task.TGClientTask;
-import com.ruoyi.system.domain.SysAccount;
-import com.ruoyi.system.domain.SysContact;
-import com.ruoyi.system.domain.SysGroup;
 import com.ruoyi.system.mapper.SysAccountMapper;
 import com.ruoyi.system.mapper.SysContactMapper;
 import com.ruoyi.system.mapper.SysGroupMapper;
@@ -27,8 +18,6 @@ import com.ruoyi.quartz.mapper.SysJobMapper;
 import com.ruoyi.quartz.service.ISysJobService;
 import com.ruoyi.quartz.util.CronUtils;
 import com.ruoyi.quartz.util.ScheduleUtils;
-
-import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
 
 /**
  * 定时任务调度信息 服务层
