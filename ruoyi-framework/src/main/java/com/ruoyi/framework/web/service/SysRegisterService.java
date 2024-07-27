@@ -18,14 +18,8 @@ import com.ruoyi.framework.util.MailUtil;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
-import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.util.Properties;
 
 /**
  * 注册校验方法
@@ -87,6 +81,7 @@ public class SysRegisterService
             sysUser.setNickName(username);
             sysUser.setPassword(SecurityUtils.encryptPassword(password));
             sysUser.setAccountDetailId(1L);
+            sysUser.setEmail(registerBody.getEmail());
             sysUser.setVipDate(0L);
             boolean regFlag = userService.registerUser(sysUser);
             if (!regFlag)

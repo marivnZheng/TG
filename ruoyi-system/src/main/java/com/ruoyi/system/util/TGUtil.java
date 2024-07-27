@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -51,7 +53,7 @@ public class TGUtil {
     }
 
     public String GenerateCommand(String methodName, HashMap parms) throws InterruptedException, IOException {
-        StringBuilder cmd = new StringBuilder();
+        ArrayList <String> cmd = new ArrayList();
         if (StringUtils.equals(methodName, "sendPhoneCode")) {
             File file = new File(getSession((String) parms.get("phoneNumber")));
             if (file.exists()) {
@@ -61,47 +63,150 @@ public class TGUtil {
                 Thread.sleep(1000);
                 log.info("等待session 文件删除");
             }
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("phoneNumber") + " ");
+            cmd.add("python");
+            cmd.add(getFilePath(methodName));
+            cmd.add(appid);
+            cmd.add(appHash);
+            cmd.add((String) parms.get("phoneNumber"));
         } else if (StringUtils.equals(methodName, "loginByPhone")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("phoneNumber") + " ").append(parms.get("codeNumber") + " ").append(parms.get("codeHash"));
+            cmd.add("python");
+            cmd.add(getFilePath(methodName));
+            cmd.add(appid);
+            cmd.add(appHash);
+            cmd.add((String) parms.get("phoneNumber"));
+            cmd.add((String) parms.get("codeHash"));
             return  login(cmd.toString(),parms.get("phoneNumber").toString());
         } else if (StringUtils.equals(methodName, "loginByPhoneAndPassword")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("phoneNumber") + " ").append(parms.get("codeNumber") + " ").append(parms.get("password") + " ").append(parms.get("codeHash"));
+            cmd.add("python");
+            cmd.add(getFilePath(methodName));
+            cmd.add(appid);
+            cmd.add(appHash);
+            cmd.add((String) parms.get("phoneNumber"));
+            cmd.add((String) parms.get("codeNumber"));
+            cmd.add((String) parms.get("password"));
+            cmd.add((String) parms.get("codeHash"));
             return  login(cmd.toString(),parms.get("phoneNumber").toString());
         } else if (StringUtils.equals(methodName, "sendMessage")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("sessionPath") + " ").append(parms.get("targetUser") + " ").append(parms.get("message")+" ").append(StringUtils.isEmpty((String) parms.get("filePath"))?"None":parms.get("filePath"));
+            cmd.add("python");
+            cmd.add(getFilePath(methodName));
+            cmd.add(appid);
+            cmd.add(appHash);
+            cmd.add((String) parms.get("sessionPath"));
+            cmd.add((String) parms.get("targetUser"));
+            cmd.add((String) parms.get("message"));
+            cmd.add(StringUtils.isEmpty((String) parms.get("filePath"))?"None":(String)parms.get("filePath"));
         }else if (StringUtils.equals(methodName, "forWordMessage")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("sessionPath") + " ").append(parms.get("targetUser") + " ").append(parms.get("messageId")+" ").append(parms.get("charId")+" ");
+            cmd.add("python");
+            cmd.add(getFilePath(methodName));
+            cmd.add(appid);
+            cmd.add(appHash);
+            cmd.add((String) parms.get("sessionPath"));
+            cmd.add((String) parms.get("targetUser"));
+            cmd.add((String) parms.get("messageId"));
+            cmd.add((String) parms.get("charId"));
         }else if(StringUtils.equals(methodName,"sendMessageChannel")){
-            cmd.append("python ").append(getFilePath(methodName)+" ").append(appid+" ").append(appHash+" ").append(parms.get("sessionPath")+" ").append(parms.get("targetUser")+" ").append(parms.get("message")+" ").append(StringUtils.isEmpty((String) parms.get("filePath"))?"None":parms.get("filePath"));
+            cmd.add("python");
+            cmd.add(getFilePath(methodName));
+            cmd.add(appid);
+            cmd.add(appHash);
+            cmd.add((String) parms.get("sessionPath"));
+            cmd.add((String) parms.get("targetUser"));
+            cmd.add((String) parms.get("message"));
+            cmd.add(StringUtils.isEmpty((String) parms.get("filePath"))?"None":(String) parms.get("filePath"));
         }else if(StringUtils.equals(methodName,"forWordMessageChannel")){
-            cmd.append("python ").append(getFilePath(methodName)+" ").append(appid+" ").append(appHash+" ").append(parms.get("sessionPath")+" ").append(parms.get("targetUser")+" ").append(parms.get("messageId")+" ").append(parms.get("charId")+" ");
+            cmd.add("python");
+            cmd.add(getFilePath(methodName));
+            cmd.add(appid);
+            cmd.add(appHash);
+            cmd.add((String) parms.get("sessionPath"));
+            cmd.add((String) parms.get("targetUser"));
+            cmd.add((String) parms.get("messageId"));
+            cmd.add((String) parms.get("charId"));
         }
-         if (StringUtils.equals(methodName, "loginBySessionFile")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("fileName") + " ");
+        else if (StringUtils.equals(methodName, "loginBySessionFile")) {
+             cmd.add("python");
+             cmd.add(getFilePath(methodName));
+             cmd.add(appid);
+             cmd.add(appHash);
+             cmd.add((String) parms.get("fileName"));
              return  login(cmd.toString(),parms.get("fileName").toString());
         } else if (StringUtils.equals(methodName, "addContact")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("sessionPath") + " ").append(parms.get("userName"));
+             cmd.add("python");
+             cmd.add(getFilePath(methodName));
+             cmd.add(appid);
+             cmd.add(appHash);
+             cmd.add((String) parms.get("sessionPath"));
+             cmd.add((String) parms.get("userName"));
         } else if (StringUtils.equals(methodName, "addContactTgPhone")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("sessionPath") + " ").append(parms.get("phone"));
+             cmd.add("python");
+             cmd.add(getFilePath(methodName));
+             cmd.add(appid);
+             cmd.add(appHash);
+             cmd.add((String) parms.get("sessionPath"));
+             cmd.add((String) parms.get("phone"));
         } else if (StringUtils.equals(methodName, "syncContact")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("sysAccountStringSession") + " ");
+             cmd.add("python");
+             cmd.add(getFilePath(methodName));
+             cmd.add(appid);
+             cmd.add(appHash);
+             cmd.add((String) parms.get("sysAccountStringSession"));
         } else if (StringUtils.equals(methodName, "syncGroup")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("sysAccountStringSession") + " ");
+             cmd.add("python");
+             cmd.add(getFilePath(methodName));
+             cmd.add(appid);
+             cmd.add(appHash);
+             cmd.add((String) parms.get("sysAccountStringSession"));
         } else if (StringUtils.equals(methodName, "getGroupMember")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("sysAccountStringSession") + " ").append(parms.get("sysGroupId"));
+             cmd.add("python");
+             cmd.add(getFilePath(methodName));
+             cmd.add(appid);
+             cmd.add(appHash);
+             cmd.add((String) parms.get("sysAccountStringSession"));
+             cmd.add((String) parms.get("sysGroupId"));
         } else if (StringUtils.equals(methodName, "InvoteGroup")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("sessionString") + " ").append(parms.get("channelId") + " ").append(parms.get("sysContactUserName"));
+             cmd.add("python");
+             cmd.add(getFilePath(methodName));
+             cmd.add(appid);
+             cmd.add(appHash);
+             cmd.add((String) parms.get("sessionString"));
+             cmd.add((String) parms.get("channelId"));
+             cmd.add((String) parms.get("sysContactUserName"));
         } else if (StringUtils.equals(methodName, "joinGroup")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("sessionString") + " ").append(parms.get("link") + " ");
+             cmd.add("python");
+             cmd.add(getFilePath(methodName));
+             cmd.add(appid);
+             cmd.add(appHash);
+             cmd.add((String) parms.get("sessionString"));
+             cmd.add((String) parms.get("link"));
         } else if (StringUtils.equals(methodName, "syncAccount")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("sessionString") + " ");
+             cmd.add("python");
+             cmd.add(getFilePath(methodName));
+             cmd.add(appid);
+             cmd.add(appHash);
+             cmd.add((String) parms.get("sessionString"));
         } else if (StringUtils.equals(methodName, "updateProFile")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("sessionString") + " ").append(parms.get("firstName") + " ").append(parms.get("lastName") + " ").append(parms.get("about") + " ").append(parms.get("userName") + " ");
+             cmd.add("python");
+             cmd.add(getFilePath(methodName));
+             cmd.add(appid);
+             cmd.add(appHash);
+             cmd.add((String) parms.get("sessionString"));
+             cmd.add((String) parms.get("firstName"));
+             cmd.add((String) parms.get("lastName"));
+             cmd.add((String) parms.get("about"));
+             cmd.add((String) parms.get("userName"));
         }else if (StringUtils.equals(methodName, "updateUserName")) {
-            cmd.append("python ").append(getFilePath(methodName) + " ").append(appid + " ").append(appHash + " ").append(parms.get("sessionString") + " ").append(parms.get("firstName") + " ").append(parms.get("lastName") + " ").append(parms.get("about") + " ").append(parms.get("userName") + " ");
+             cmd.add("python");
+             cmd.add(getFilePath(methodName));
+             cmd.add(appid);
+             cmd.add(appHash);
+             cmd.add((String) parms.get("sessionString"));
+             cmd.add((String) parms.get("firstName"));
+             cmd.add((String) parms.get("lastName"));
+             cmd.add((String) parms.get("about"));
+             cmd.add((String) parms.get("userName"));
         }
-        return execCmd(cmd.toString());
+        String[] stringArray = cmd.toArray(new String[cmd.size()]);
+        return execCmd(stringArray);
     }
 
     public String login(String cmd,String key) throws InterruptedException, IOException {
@@ -133,13 +238,12 @@ public class TGUtil {
         }
     }
 
-    public String execCmd(String cmd) {
-        log.info("执行python 文件参数：{}",cmd);
+    public String execCmd(String [] cmd) {
+        log.info("执行python 文件参数：{}", Arrays.toString(cmd));
         StringBuilder cmdResult = new StringBuilder();
-        Process p = null;
         try {
-            p = Runtime.getRuntime().exec(cmd);
-            InputStream fis = p.getInputStream();
+            Process process = Runtime.getRuntime().exec(cmd);
+            InputStream fis = process.getInputStream();
             InputStreamReader isr = new InputStreamReader(fis, Charset.forName("gbk"));
             BufferedReader br = new BufferedReader(isr);
             String line = null;

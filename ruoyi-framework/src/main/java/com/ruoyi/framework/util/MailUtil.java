@@ -1,7 +1,6 @@
 package com.ruoyi.framework.util;
 
 import com.ruoyi.common.core.domain.AjaxResult;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.mail.*;
@@ -10,37 +9,20 @@ import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 import java.util.Random;
 
+
 @Component
 public class MailUtil {
 
-
-    private String mail ="jlongtgtg@163.com";
-
-    private String username ="jlongtgtg@163.com";
-
-    private String passWord ="WNIYXAEUUFPUSSVW";
-
-    private String host = "smtp.163.com";
-
-    private Properties props;
-
-    public Properties getProps() {
-        if(this.props.containsKey("mail.smtp.host")){
-                return  this.props;
-        }else{
-            Properties props = new Properties();
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.ssl.enable", "true");
-            props.put("mail.smtp.host", host);
-            props.put("mail.smtp.port", "465 ");
-            this.props=props;
-            return  this.props;
-        }
-
-    }
-
     public  AjaxResult sendMailGetCode(String sendTo){
-        getProps();
+        String mail ="jlongtgtg@163.com";
+        String username ="jlongtgtg@163.com";
+        String passWord ="WNIYXAEUUFPUSSVW";
+        String host = "smtp.163.com";
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.ssl.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "465 ");
         // 获取 Session 实例
         Session session = Session.getInstance(props,
                 new javax.mail.Authenticator() {

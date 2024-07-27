@@ -115,6 +115,13 @@ public class TgTaskConsumer{
                                                                 log.info("执行任务类型为：{}",myJobDetail.getTaskClass());
                                                                 exec(parms,myJobDetail,myJob);
                                                         }
+                                                }else if (intervalsUnit==0){
+                                                        Date nextPlanDate = DateUtils.addSeconds(nowDate, Integer.valueOf(intervals));
+                                                        int i = myJobMapper.updateStatus(-2, myJobDetail.getJobDetailId(),nextPlanDate);
+                                                        if(i>0){
+                                                                log.info("执行任务类型为：{}",myJobDetail.getTaskClass());
+                                                                exec(parms,myJobDetail,myJob);
+                                                        }
                                                 }
                                         }
                                 }
@@ -139,6 +146,13 @@ public class TgTaskConsumer{
                                                 }else if(intervalsUnit==2){
                                                         //循环间隔为小时
                                                         Date nextPlanDate = DateUtils.addHours(nowDate, Integer.valueOf(intervals));
+                                                        int i = myJobMapper.updateStatus(-2, myJobDetail.getJobDetailId(),nextPlanDate);
+                                                        if(i>0){
+                                                                log.info("执行任务类型为：{}",myJobDetail.getTaskClass());
+                                                                exec(parms,myJobDetail,myJob);
+                                                        }
+                                                }else if (intervalsUnit==0){
+                                                        Date nextPlanDate = DateUtils.addSeconds(nowDate, Integer.valueOf(intervals));
                                                         int i = myJobMapper.updateStatus(-2, myJobDetail.getJobDetailId(),nextPlanDate);
                                                         if(i>0){
                                                                 log.info("执行任务类型为：{}",myJobDetail.getTaskClass());
