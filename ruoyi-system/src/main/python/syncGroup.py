@@ -28,7 +28,6 @@ for d in client.iter_dialogs():
         inviteUsers = '',
         sendMessages = '',
         id = str(en.id)
-
         title = en.title
         if en.admin_rights != 'None':
             rights = en.default_banned_rights
@@ -46,25 +45,29 @@ for d in client.iter_dialogs():
         is_chat = d.is_group and not d.is_channel and not en.deactivated
         admin = en.creator or (en.admin_rights and en.admin_rights.invite_users)
         if not d.is_channel or is_chat: continue
-        if public:
-            link = f'{en.username}'
+        if en.usernames:
+            link = f'{en.usernames[0].username}'
             print(json.dumps(
                 myGroup(link, inviteUsers, sendPhotos, sendMessages, is_group, id, title).__dict__).encode('utf-8'))
-        elif admin:
-            if is_chat:
-                r = client(_fn.messages.GetFullChatRequest(en.id))
-            else:
-                r = client(_fn.channels.GetFullChannelRequest(en))
-
-            link = r.full_chat.exported_invite
-            print(json.dumps(
-                myGroup(link.link, inviteUsers, sendPhotos, sendMessages, is_group, id, title).__dict__).encode('utf-8'))
-
         else:
-            print(json.dumps(
-                myGroup(link, inviteUsers, sendPhotos, sendMessages, is_group, id, title).__dict__).encode('utf-8'))
+            if public:
+                link = f'{en.username}'
+                print(json.dumps(
+                    myGroup(link, inviteUsers, sendPhotos, sendMessages, is_group, id, title).__dict__).encode('utf-8'))
 
+            elif admin:
+                if is_chat:
+                    r = client(_fn.messages.GetFullChatRequest(en.id))
+                else:
+                    r = client(_fn.channels.GetFullChannelRequest(en))
 
+                link = r.full_chat.exported_invite
+                print(json.dumps(
+                    myGroup(link.link, inviteUsers, sendPhotos, sendMessages, is_group, id, title).__dict__).encode('utf-8'))
+
+            else:
+                print(json.dumps(
+                    myGroup(link, inviteUsers, sendPhotos, sendMessages, is_group, id, title).__dict__).encode('utf-8'))
     except Exception as e:
         print("{"+'"code":"{}","msg":"{}"'.format(400,e)+"}")
 

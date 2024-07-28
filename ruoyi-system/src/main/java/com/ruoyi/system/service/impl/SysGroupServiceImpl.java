@@ -448,7 +448,12 @@ public class SysGroupServiceImpl implements ISysGroupService
         String stringSession  =sysGroup.getSysAccountStringSession();
         String sysGroupId = sysGroup.getSysGroupLink();
         HashMap parms = new HashMap();
-        parms.put("sysGroupId","https://t.me/"+sysGroupId);
+        if(StringUtils.equals(sysGroupId,"null")){
+            parms.put("sysGroupId",sysGroup.getSysGroupId());
+        }else{
+            parms.put("sysGroupId","https://t.me/"+sysGroupId);
+        }
+
         parms.put("sysAccountStringSession",stringSession);
         List<SysContact> sysContactList= new ArrayList<>();
         try {

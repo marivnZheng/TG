@@ -91,6 +91,7 @@ public class SysTaskServiceImpl implements ISysTaskService
         List<Object> accountList = (List<Object>) map.get("accountList");
         String targActive = (String) map.get("targActive");
         String sendMethod=(String) map.get("sendMethod");
+        Long accountDetailId = getLoginUser().getUser().getAccountDetailId();
         long  longTime =System.currentTimeMillis();
         int tarNum = 0;
         if(syscontacids==null&&groupList==null){
@@ -110,7 +111,8 @@ public class SysTaskServiceImpl implements ISysTaskService
                     parms.put("endTime",map.get("endTime"));
                     parms.put("startTime",map.get("startTime"));
                     parms.put("endDate",map.get("endDate"));
-
+                    parms.put("endDate",map.get("endDate"));
+                    parms.put("isVip",accountDetailId>1?true:false);
                     MyJob myJob = new MyJob();
 
                     myJob.setIntervals(onceMin+"");
@@ -159,6 +161,7 @@ public class SysTaskServiceImpl implements ISysTaskService
                     parms.put("messageGroup",map.get("messageGroup"));
                     parms.put("forWordMessage",map.get("forWordMessage"));
                     parms.put("sendIndex",0);
+                    parms.put("isVip",accountDetailId>1?true:false);
                     parms.put("endTime",map.get("endTime"));
                     parms.put("startTime",map.get("startTime"));
                     parms.put("endDate",map.get("endDate"));
@@ -209,6 +212,7 @@ public class SysTaskServiceImpl implements ISysTaskService
                     parms.put("sendIndex",0);
                     parms.put("endTime",map.get("endTime"));
                     parms.put("startTime",map.get("startTime"));
+                    parms.put("isVip",accountDetailId>1?true:false);
                     parms.put("endDate",map.get("endDate"));
                     myJob.setJobName(StringUtils.equals(selectOption,"0")?"发送信息给用户":"发送信息给频道");
                     myJob.setJobType(StringUtils.equals(sendMethod,"1")?"1":"2");
@@ -251,6 +255,7 @@ public class SysTaskServiceImpl implements ISysTaskService
                     parms.put("endTime",map.get("endTime"));
                     parms.put("startTime",map.get("startTime"));
                     parms.put("endDate",map.get("endDate"));
+                    parms.put("isVip",accountDetailId>1?true:false);
                     MyJob myJob = new MyJob();
                     myJob.setIntervals(minCount.toString());
                     myJob.setIntervalsUnit(Integer.valueOf(min));
@@ -308,6 +313,7 @@ public class SysTaskServiceImpl implements ISysTaskService
         }
         long  longTime =System.currentTimeMillis();
         int tarNum = 0;
+        Long accountDetailId = getLoginUser().getUser().getAccountDetailId();
         if(StringUtils.equals(shareType,"1")){
             for (Map account : accountList) {
                 tarNum=list.size();
@@ -316,6 +322,7 @@ public class SysTaskServiceImpl implements ISysTaskService
                 parms.put("messageGroup",map.get("messageGroup"));
                 parms.put("sendIndex",0);
                 parms.put("endTime",map.get("endTime"));
+                parms.put("isVip",accountDetailId>1?true:false);
                 parms.put("startTime",map.get("startTime"));
                 parms.put("endDate",map.get("endDate"));
                 MyJob myJob = new MyJob();
@@ -359,6 +366,7 @@ public class SysTaskServiceImpl implements ISysTaskService
                 parms.put("endTime",map.get("endTime"));
                 parms.put("startTime",map.get("startTime"));
                 parms.put("endDate",map.get("endDate"));
+                parms.put("isVip",accountDetailId>1?true:false);
                 MyJob myJob = new MyJob();
                 myJob.setIntervals(onceMin+"");
                 myJob.setIntervalsUnit(Integer.valueOf(onceType));

@@ -104,7 +104,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<update id="updateStatus"  >
 		update my_job_detail a set a.my_job_detail_status=-2 ,a.my_job_detail_next_plan_date=#{nextPlanDate}   where my_job_detail_id =#{jobDetailId}
 	</update>
-
 	<update id="updateMyJobMessageGroup">
 		update my_job a set a.parms=#{parms} where job_id =#{jobId}
 	</update>

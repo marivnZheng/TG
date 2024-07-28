@@ -48,13 +48,18 @@ public class sendMessageChannelRunnable implements Runnable {
         String forWordMessage = (String) map.get("forWordMessage");
         try {
             //获取消息组
+            Boolean isVip = (Boolean) map.get("isVip");
             List<Map> messageGroupList= (List<Map>) map.get("messageGroup");
             Integer sendIndex = (Integer) map.get("sendIndex");
             Map messageGroup = messageGroupList.get(sendIndex);
             String executablePath = StringUtils.isEmpty((String) messageGroup.get("fileName"))?"": System.getProperty("user.dir")+"/"+messageGroup.get("fileName");
             map.put("filePath",executablePath);
             map.put("targetUser",StringUtils.isNotEmpty(myJobDetail.getTarg())?myJobDetail.getTarg():myJobDetail.getTargId());
-            map.put("message",messageGroup.get("message"));
+            if(isVip){
+                map.put("message",StringUtils.isEmpty((String) messageGroup.get("message"))?"None":messageGroup.get("message"));
+            }else{
+                map.put("message",StringUtils.isEmpty((String) messageGroup.get("message"))?"None":messageGroup.get("message")+"\n \n 欢迎使用九龙电报群发系统 @jiulong_tg");
+            }
             String result="";
             if(StringUtils.isNotEmpty(forWordMessage)){
                 //"https://t.me/sosoqun567/79659"
