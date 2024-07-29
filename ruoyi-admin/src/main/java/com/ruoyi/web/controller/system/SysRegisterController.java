@@ -40,7 +40,11 @@ public class SysRegisterController extends BaseController
     @PostMapping("/sendMail")
     public AjaxResult sendMail(@RequestBody RegisterBody user)
     {
-
         return registerService.sendMailGetCode(user);
+    }
+    @PostMapping("/getCurrentUser")
+    public AjaxResult getCurrentUser()
+    {
+        return registerService.getCurrentUser();
     }
 }

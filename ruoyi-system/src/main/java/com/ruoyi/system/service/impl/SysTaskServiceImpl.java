@@ -85,9 +85,9 @@ public class SysTaskServiceImpl implements ISysTaskService
         List<Map> messageGroup =  (List<Map>) map.get("messageGroup");
         String onceType = (String) map.get("onceType");
         String loopType = (String) map.get("loopType");
-        Integer loopMin = (Integer) map.get("loopMin");
+        Integer loopMin =map.containsKey("loopMin")?(Integer) map.get("loopMin"):null;
         String hour = (String) map.get("hour");
-        Integer hourCount = (Integer) map.get("hourCount");
+        Integer hourCount =map.containsKey("hourCount")?(Integer) map.get("hourCount"):null;
         List<Object> accountList = (List<Object>) map.get("accountList");
         String targActive = (String) map.get("targActive");
         String sendMethod=(String) map.get("sendMethod");
@@ -117,8 +117,10 @@ public class SysTaskServiceImpl implements ISysTaskService
 
                     myJob.setIntervals(onceMin+"");
                     myJob.setIntervalsUnit(Integer.valueOf(onceType));
-                    myJob.setIntervalLoop(loopMin+"");
-                    myJob.setIntervalLoopUnit(Integer.valueOf(loopType));
+                    if(StringUtils.isNotNull(loopMin)){
+                        myJob.setIntervalLoop(loopMin.toString());
+                        myJob.setIntervalLoopUnit(Integer.valueOf(loopType));
+                    }
                     myJob.setJobName(StringUtils.equals(selectOption,"0")?"发送信息给用户":"发送信息给频道");
                     myJob.setJobType(StringUtils.equals(sendMethod,"1")?"1":"2");
                     myJob.setTarNum(tarNum);
@@ -168,8 +170,10 @@ public class SysTaskServiceImpl implements ISysTaskService
                     MyJob myJob = new MyJob();
                     myJob.setIntervals(onceMin+"");
                     myJob.setIntervalsUnit(Integer.valueOf(onceType));
-                    myJob.setIntervalLoop(loopMin+"");
-                    myJob.setIntervalLoopUnit(Integer.valueOf(loopType));
+                    if(StringUtils.isNotNull(loopMin)){
+                        myJob.setIntervalLoop(loopMin.toString());
+                        myJob.setIntervalLoopUnit(Integer.valueOf(loopType));
+                    }
                     myJob.setJobName(StringUtils.equals(selectOption,"0")?"发送信息给用户":"发送信息给频道");
                     myJob.setJobType(StringUtils.equals(sendMethod,"1")?"1":"2");
                     myJob.setTarNum(tarNum);
@@ -219,8 +223,10 @@ public class SysTaskServiceImpl implements ISysTaskService
                     myJob.setTarNum(tarNum);
                     myJob.setIntervals(minCount+"");
                     myJob.setIntervalsUnit(Integer.valueOf(min));
-                    myJob.setIntervalLoop(hourCount+"");
-                    myJob.setIntervalLoopUnit(Integer.valueOf(hour));
+                    if(StringUtils.isNotNull(hourCount)){
+                        myJob.setIntervalLoop(hourCount+"");
+                        myJob.setIntervalLoopUnit(Integer.valueOf(hour));
+                    }
                     myJob.setParms(JSON.toJSONString(parms));
                     myJob.setJobClass("com.ruoyi.system.runnable.sendMessageContactRunnable");
                     myJob.setCreateDate(DateUtils.getNowDate());
@@ -259,8 +265,10 @@ public class SysTaskServiceImpl implements ISysTaskService
                     MyJob myJob = new MyJob();
                     myJob.setIntervals(minCount.toString());
                     myJob.setIntervalsUnit(Integer.valueOf(min));
-                    myJob.setIntervalLoop(hourCount.toString());
-                    myJob.setIntervalLoopUnit(Integer.valueOf(hour));
+                    if(StringUtils.isNotNull(hourCount)){
+                        myJob.setIntervalLoop(hourCount.toString());
+                        myJob.setIntervalLoopUnit(Integer.valueOf(hour));
+                    }
                     myJob.setJobName(StringUtils.equals(selectOption,"0")?"发送信息给用户":"发送信息给频道");
                     myJob.setJobType(StringUtils.equals(sendMethod,"1")?"1":"2");
                     myJob.setTarNum(tarNum);

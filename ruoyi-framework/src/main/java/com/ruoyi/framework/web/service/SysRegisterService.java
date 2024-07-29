@@ -5,6 +5,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.exception.user.CaptchaException;
@@ -20,6 +21,10 @@ import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+
+import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
 
 /**
  * 注册校验方法
@@ -103,6 +108,16 @@ public class SysRegisterService
         return mailUtil.sendMailGetCode(registerBody.getEmail());
     }
 
+    public AjaxResult getCurrentUser(){
+        SysUser user = getLoginUser().getUser();
+        HashMap map = new HashMap();
+        if(user.getAccountDetailId()>1){
+            map.put("isVip",true);
+        }else{
+            map.put("isVip",false);
+        }
+        return AjaxResult.success(map);
+    }
 
     /**
      * 校验验证码
