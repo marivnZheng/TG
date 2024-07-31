@@ -74,7 +74,8 @@ public class TGUtil {
             cmd.add(appid);
             cmd.add(appHash);
             cmd.add((String) parms.get("phoneNumber"));
-            cmd.add((String) parms.get("codeHash"));
+            cmd.add((String) parms.get("codeNumber"));
+            cmd.add(parms.get("codeHash").toString().replace("\n",""));
             String[] stringArray = cmd.toArray(new String[cmd.size()]);
             return  login(stringArray,parms.get("phoneNumber").toString());
         } else if (StringUtils.equals(methodName, "loginByPhoneAndPassword")) {
@@ -85,7 +86,7 @@ public class TGUtil {
             cmd.add((String) parms.get("phoneNumber"));
             cmd.add((String) parms.get("codeNumber"));
             cmd.add((String) parms.get("password"));
-            cmd.add((String) parms.get("codeHash"));
+            cmd.add(parms.get("codeHash").toString().replace("\n",""));
             String[] stringArray = cmd.toArray(new String[cmd.size()]);
             return  login(stringArray,parms.get("phoneNumber").toString());
         } else if (StringUtils.equals(methodName, "sendMessage")) {

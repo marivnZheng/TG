@@ -64,35 +64,41 @@ public class SysContactServiceImpl implements ISysContactService {
 
     @Override
     public AjaxResult syncContact(List<SysAccount> sysAccountList) {
-        sysAccountList.forEach(e -> {
-            String sysAccountStringSession = e.getSysAccountStringSession();
-            HashMap parms = new HashMap();
-            parms.put("sysAccountStringSession", sysAccountStringSession);
-            log.info("当前账号为：{}，账号为：{}，开始同步好友。",getLoginUser().getUsername(),e.getSysAccountId());
-            sysContactMapper.deleteSysContactByAccountId(e.getSysAccountId());
-            try {
-                String syncContact = tgUtil.GenerateCommand("syncContact", parms);
-                for (String s : syncContact.split("\n")) {
-                    String substring = s.substring(s.indexOf("{"), s.indexOf("}") + 1);
-                    Map map = JSON.parseObject(tgUtil.decodeJson(substring).replace("\\\\\"", "\\\""), Map.class);
-                    SysContact sysContact = new SysContact();
-                    sysContact.setSysStatus(Long.parseLong((String) map.get("stutas")));
-                    String firstName=StringUtils.isEmpty((String) map.get("firstname"))? "" :(String) map.get("firstname");
-                    String lastName=StringUtils.isEmpty((String) map.get("lastname"))? "" :(String) map.get("lastname");
-                    String name = firstName+lastName;
-                    sysContact.setSysContactName(name);
-                    sysContact.setSysContactUserName((String) map.get("sysContactUserName"));
-                    sysContact.setSysMutualContact(Long.parseLong((String) map.get("sysMutualContact")));
-                    sysContact.setSysUserId(getLoginUser().getUserId());
-                    sysContact.setSysContactPhone((String) map.get("contactNumberr"));
-                    sysContact.setSysContactId(Long.parseLong((String) map.get("contactId")));
-                    sysContact.setSysAccountId(e.getSysAccountId());
-                    sysContactMapper.insertSysContact(sysContact);
-                }
-            } catch (InterruptedException | IOException ex) {
-                ex.printStackTrace();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                sysAccountList.forEach(e -> {
+                    String sysAccountStringSession = e.getSysAccountStringSession();
+                    HashMap parms = new HashMap();
+                    parms.put("sysAccountStringSession", sysAccountStringSession);
+                    log.info("当前账号为：{}，账号为：{}，开始同步好友。",getLoginUser().getUsername(),e.getSysAccountId());
+                    sysContactMapper.deleteSysContactByAccountId(e.getSysAccountId());
+                    try {
+                        String syncContact = tgUtil.GenerateCommand("syncContact", parms);
+                        for (String s : syncContact.split("\n")) {
+                            String substring = s.substring(s.indexOf("{"), s.indexOf("}") + 1);
+                            Map map = JSON.parseObject(tgUtil.decodeJson(substring).replace("\\\\\"", "\\\""), Map.class);
+                            SysContact sysContact = new SysContact();
+                            sysContact.setSysStatus(Long.parseLong((String) map.get("stutas")));
+                            String firstName=StringUtils.isEmpty((String) map.get("firstname"))? "" :(String) map.get("firstname");
+                            String lastName=StringUtils.isEmpty((String) map.get("lastname"))? "" :(String) map.get("lastname");
+                            String name = firstName+lastName;
+                            sysContact.setSysContactName(name);
+                            sysContact.setSysContactUserName((String) map.get("sysContactUserName"));
+                            sysContact.setSysMutualContact(Long.parseLong((String) map.get("sysMutualContact")));
+                            sysContact.setSysUserId(getLoginUser().getUserId());
+                            sysContact.setSysContactPhone((String) map.get("contactNumberr"));
+                            sysContact.setSysContactId(Long.parseLong((String) map.get("contactId")));
+                            sysContact.setSysAccountId(e.getSysAccountId());
+                            sysContactMapper.insertSysContact(sysContact);
+                        }
+                    } catch (InterruptedException | IOException ex) {
+                        ex.printStackTrace();
+                    }
+                });
             }
-        });
+        };
+        runnable.run();
 
         return AjaxResult.success("同步成功");
     }

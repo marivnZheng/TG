@@ -7,14 +7,18 @@ import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.constant.HttpStatus;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysRole;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysAccount;
 import com.ruoyi.system.domain.SysAccountDetail;
+import com.ruoyi.system.domain.SysContact;
 import com.ruoyi.system.domain.SysGroup;
 import com.ruoyi.system.dto.TgLogin;
 import com.ruoyi.system.mapper.SysAccountMapper;
+import com.ruoyi.system.mapper.SysContactMapper;
+import com.ruoyi.system.mapper.SysGroupMapper;
 import com.ruoyi.system.service.ISysAccountDetailService;
 import com.ruoyi.system.service.ISysAccountService;
 import com.ruoyi.system.util.TGUtil;
@@ -31,10 +35,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.ruoyi.common.core.domain.AjaxResult.error;
 import static com.ruoyi.common.core.domain.AjaxResult.success;
 import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
+
 
 /**
  * Service业务层处理
@@ -54,6 +61,14 @@ public class SysAccountServiceImpl implements ISysAccountService
 
     @Autowired
     private  ISysAccountDetailService sysAccountDetailService;
+
+    @Autowired
+    private SysContactMapper sysContactMapper;
+
+    @Autowired
+    private SysGroupMapper sysGroupMapper;
+
+    private ExecutorService executor = Executors.newCachedThreadPool() ;
 
     /**
      * 查询
@@ -149,6 +164,77 @@ public class SysAccountServiceImpl implements ISysAccountService
         }
         return success();
     }
+    public void syncGroup(String sysAccountStringSession,Long sysAccountId,SysUser user ){
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                    HashMap parms = new HashMap();
+                    parms.put("sysAccountStringSession",sysAccountStringSession);
+                    try {
+                        log.info("当前账号为：{}，账号为：{}，开始同步好友。",user.getUserName(),sysAccountId);
+                        sysGroupMapper.deleteSysContactByAccountId(sysAccountId);
+                        String syncGroup = tgUtil.GenerateCommand("syncGroup", parms);
+                        for (String s : syncGroup.split("\n")) {
+                            String substring = s.substring(s.indexOf("{"), s.indexOf("}")+1);
+                            Map map = JSON.parseObject(tgUtil.decodeJson(substring), Map.class);
+                            SysGroup group =new SysGroup();
+                            group.setSysGroupLink((String) map.get("link"));
+                            group.setSysGroupTitle((String) map.get("title"));
+                            group.setSysGroupId(Long.valueOf((String) map.get("id")));
+                            group.setSysGroupDetail(String.valueOf((Boolean)map.get("isGroup")));
+                            group.setSysGroupSendMessage(Long.valueOf((Boolean)map.get("sendMessages")?0:1));
+                            group.setSysGroupSendPhoto(Long.valueOf((Boolean)map.get("sendPhotos")?0:1));
+                            group.setSysGroupInvite(Long.valueOf((Boolean)map.get("inviteUsers")?0:1));
+                            group.setSysUserId(user.getUserId());
+                            group.setSysAccountStringSession(sysAccountStringSession);
+                            group.setSysAccountId(sysAccountId);
+                            sysGroupMapper.insertSysGroup(group);
+                        }
+                    } catch (InterruptedException | IOException ex) {
+                        ex.printStackTrace();
+                    }
+            }
+        };
+        executor.execute(runnable);
+    }
+
+ public void syncContact(String sysAccountStringSession,Long sysAccountId,SysUser user ){
+
+     Runnable runnable = new Runnable() {
+         @Override
+         public void run() {
+                 HashMap parms = new HashMap();
+                 parms.put("sysAccountStringSession", sysAccountStringSession);
+                 log.info("当前账号为：{}，账号为：{}，开始同步好友。",user.getUserName(),sysAccountId);
+                 sysContactMapper.deleteSysContactByAccountId(sysAccountId);
+                 try {
+                     String syncContact = tgUtil.GenerateCommand("syncContact", parms);
+                     for (String s : syncContact.split("\n")) {
+                         String substring = s.substring(s.indexOf("{"), s.indexOf("}") + 1);
+                         Map map = JSON.parseObject(tgUtil.decodeJson(substring).replace("\\\\\"", "\\\""), Map.class);
+                         SysContact sysContact = new SysContact();
+                         sysContact.setSysStatus(Long.parseLong((String) map.get("stutas")));
+                         String firstName=StringUtils.isEmpty((String) map.get("firstname"))? "" :(String) map.get("firstname");
+                         String lastName=StringUtils.isEmpty((String) map.get("lastname"))? "" :(String) map.get("lastname");
+                         String name = firstName+lastName;
+                         sysContact.setSysContactName(name);
+                         sysContact.setSysContactUserName((String) map.get("sysContactUserName"));
+                         sysContact.setSysMutualContact(Long.parseLong((String) map.get("sysMutualContact")));
+                         sysContact.setSysUserId(user.getUserId());
+                         sysContact.setSysContactPhone((String) map.get("contactNumberr"));
+                         sysContact.setSysContactId(Long.parseLong((String) map.get("contactId")));
+                         sysContact.setSysAccountId(sysAccountId);
+                         sysContactMapper.insertSysContact(sysContact);
+                     }
+                 } catch (InterruptedException | IOException ex) {
+                     ex.printStackTrace();
+                 }
+
+         }
+     };
+     executor.execute(runnable);
+ }
+
 
     @Override
     public AjaxResult loginAccountByPhoneCode(TgLogin tgLogin) throws InterruptedException, IOException {
@@ -175,7 +261,16 @@ public class SysAccountServiceImpl implements ISysAccountService
                sysAccount.setSysAccountCreateTimezone(ZoneId.systemDefault().toString());
                sysAccount.setSysUserId(getLoginUser().getUserId());
                sysAccountMapper.insertSysAccount(sysAccount);
+               //开启线程同步好友及群聊
+
+               String sessionString=(String)msg.get("sessionString");
+               SysUser user = getLoginUser().getUser();
+               syncContact(sessionString,sysAccount.getSysAccountId(),user);
+               syncGroup(sessionString,sysAccount.getSysAccountId(),user);
+
                return success();
+
+
 
 
            }else  if(StringUtils.equals("400",String.valueOf(resultMap.get("code")))){
@@ -207,6 +302,10 @@ public class SysAccountServiceImpl implements ISysAccountService
                 sysAccount.setSysAccountCreateTimezone(ZoneId.systemDefault().toString());
                 sysAccount.setSysUserId(getLoginUser().getUserId());
                 sysAccountMapper.insertSysAccount(sysAccount);
+                SysUser user = getLoginUser().getUser();
+                String sessionString=(String)msg.get("sessionString");
+                syncContact(sessionString,sysAccount.getSysAccountId(),user);
+                syncGroup(sessionString,sysAccount.getSysAccountId(),user);
                 return success();
             }else{
                 return  new AjaxResult(400,"未知错误");

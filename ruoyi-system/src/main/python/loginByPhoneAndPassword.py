@@ -35,7 +35,6 @@ if not client.is_user_authorized():
         full =  client(GetFullUserRequest(result))
         loginEntity = initLoginEntity(phone, phone, MySession,ContactNum, groupnum,result.username,result.first_name,result.last_name,full.full_user.about)
         result = "{" + '"code":"{}","msg":{}'.format(200, json.dumps(loginEntity.__dict__)) + "}"
-        sys.stdout.flush()
         r.set(phone, result)
         @client.on(events.NewMessage(pattern='/start'))
         async def handler(event):

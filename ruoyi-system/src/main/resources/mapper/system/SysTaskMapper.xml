@@ -36,6 +36,7 @@
         <result property="taskClass"    column="my_job_detail_task_class"    />
         <result property="index"    column="my_job_detail_index"    />
         <result property="targId"    column="my_job_detail_targ_id"    />
+        <result property="nextPlanDate"    column="my_job_detail_next_plan_date"    />
 
     </resultMap>
 

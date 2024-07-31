@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
+import com.ruoyi.framework.web.service.SysRegisterService;
 import com.ruoyi.system.dto.TgLogin;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class SysAccountController extends BaseController
 {
     @Autowired
     private ISysAccountService sysAccountService;
+
+    @Autowired
+    private SysRegisterService registerService;
 
     /**
      * 查询列表
@@ -77,6 +81,13 @@ public class SysAccountController extends BaseController
     @GetMapping(value = "sendPhoneCode/{phoneNumber}")
     public AjaxResult getPhoneCode(@PathVariable("phoneNumber") String phoneNumber) throws InterruptedException, IOException {
         return success(sysAccountService.sendPhoneCode(phoneNumber));
+    }
+
+
+    @PostMapping("/getCurrentUser")
+    public AjaxResult getCurrentUser()
+    {
+        return registerService.getCurrentUser();
     }
 
     @PreAuthorize("@ss.hasPermi('system:account:query')")

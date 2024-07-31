@@ -59,7 +59,7 @@ public class sendMessageContactRunnable implements Runnable {
             if(isVip){
                 map.put("message",StringUtils.isEmpty((String) messageGroup.get("message"))?"None":messageGroup.get("message"));
             }else{
-                map.put("message",StringUtils.isEmpty((String) messageGroup.get("message"))?"None":messageGroup.get("message")+"\n \n 欢迎使用九龙电报群发系统 http://l999999999.com/");
+                map.put("message",StringUtils.isEmpty((String) messageGroup.get("message"))?"None":messageGroup.get("message")+"\n \n  <b><a href=\"http://l999999999.com\">欢迎使用九龙Telegram群发测试版</a></b>");
             }
             String result="";
             if(StringUtils.isNotEmpty(forWordMessage)){

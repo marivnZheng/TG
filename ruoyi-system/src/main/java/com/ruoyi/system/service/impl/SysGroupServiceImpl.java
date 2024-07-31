@@ -139,36 +139,43 @@ public class SysGroupServiceImpl implements ISysGroupService
 
     @Override
     public AjaxResult syncGroup(List<SysAccount> accountList) {
-        accountList.forEach(e->{
-            String sysAccountStringSession = e.getSysAccountStringSession();
-            Long sysAccountId = e.getSysAccountId();
-            HashMap parms = new HashMap();
-            parms.put("sysAccountStringSession",sysAccountStringSession);
-            try {
-                log.info("当前账号为：{}，账号为：{}，开始同步好友。",getLoginUser().getUsername(),e.getSysAccountId());
-                sysGroupMapper.deleteSysContactByAccountId(e.getSysAccountId());
-                String syncGroup = tgUtil.GenerateCommand("syncGroup", parms);
-                for (String s : syncGroup.split("\n")) {
-                    String substring = s.substring(s.indexOf("{"), s.indexOf("}")+1);
-                    Map map = JSON.parseObject(tgUtil.decodeJson(substring), Map.class);
-                    SysGroup group =new SysGroup();
-                    group.setSysGroupLink((String) map.get("link"));
-                    group.setSysGroupTitle((String) map.get("title"));
-                    group.setSysGroupId(Long.valueOf((String) map.get("id")));
-                    group.setSysGroupDetail(String.valueOf((Boolean)map.get("isGroup")));
-                    group.setSysGroupSendMessage(Long.valueOf((Boolean)map.get("sendMessages")?0:1));
-                    group.setSysGroupSendPhoto(Long.valueOf((Boolean)map.get("sendPhotos")?0:1));
-                    group.setSysGroupInvite(Long.valueOf((Boolean)map.get("inviteUsers")?0:1));
-                    group.setSysUserId(getLoginUser().getUserId());
-                    group.setSysAccountStringSession(sysAccountStringSession);
-                    group.setSysAccountId(sysAccountId);
-                    sysGroupMapper.insertSysGroup(group);
-                }
-            } catch (InterruptedException | IOException ex) {
-                ex.printStackTrace();
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                accountList.forEach(e->{
+                    String sysAccountStringSession = e.getSysAccountStringSession();
+                    Long sysAccountId = e.getSysAccountId();
+                    HashMap parms = new HashMap();
+                    parms.put("sysAccountStringSession",sysAccountStringSession);
+                    try {
+                        log.info("当前账号为：{}，账号为：{}，开始同步好友。",getLoginUser().getUsername(),e.getSysAccountId());
+                        sysGroupMapper.deleteSysContactByAccountId(e.getSysAccountId());
+                        String syncGroup = tgUtil.GenerateCommand("syncGroup", parms);
+                        for (String s : syncGroup.split("\n")) {
+                            String substring = s.substring(s.indexOf("{"), s.indexOf("}")+1);
+                            Map map = JSON.parseObject(tgUtil.decodeJson(substring), Map.class);
+                            SysGroup group =new SysGroup();
+                            group.setSysGroupLink((String) map.get("link"));
+                            group.setSysGroupTitle((String) map.get("title"));
+                            group.setSysGroupId(Long.valueOf((String) map.get("id")));
+                            group.setSysGroupDetail(String.valueOf((Boolean)map.get("isGroup")));
+                            group.setSysGroupSendMessage(Long.valueOf((Boolean)map.get("sendMessages")?0:1));
+                            group.setSysGroupSendPhoto(Long.valueOf((Boolean)map.get("sendPhotos")?0:1));
+                            group.setSysGroupInvite(Long.valueOf((Boolean)map.get("inviteUsers")?0:1));
+                            group.setSysUserId(getLoginUser().getUserId());
+                            group.setSysAccountStringSession(sysAccountStringSession);
+                            group.setSysAccountId(sysAccountId);
+                            sysGroupMapper.insertSysGroup(group);
+                        }
+                    } catch (InterruptedException | IOException ex) {
+                        ex.printStackTrace();
+                    }
+                });
             }
-        });
-        return null;
+        };
+        runnable.run();
+        return success();
     }
 
     @Override

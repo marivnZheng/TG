@@ -18,10 +18,10 @@ try:
     if  message == "None":
         message = ""
     if filePath != "None":
-        result = client.send_file(user,filePath, caption=message)
+        result = client.send_file(user,filePath, caption=message,parse_mode='html')
         print("{"+'"code":"{}","msg":"{}"'.format(200,"发送成功")+"}")
     else:
-        result = client.send_message(user, message)
+        result = client.send_message(user, message,parse_mode='html')
         print("{"+'"code":"{}","msg":"{}"'.format(200,"发送成功")+"}")
 except Exception as e:
 
