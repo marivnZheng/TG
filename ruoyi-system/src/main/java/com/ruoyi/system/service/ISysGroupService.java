@@ -18,13 +18,7 @@ import com.ruoyi.system.domain.SysGroup;
  */
 public interface ISysGroupService 
 {
-    /**
-     * 查询
-     * 
-     * @param sysGroupId 主键
-     * @return 
-     */
-    public SysGroup selectSysGroupBySysGroupId(Long sysGroupId);
+
 
     /**
      * 查询列表

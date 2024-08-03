@@ -103,17 +103,6 @@ public class SysContactController extends BaseController
         ExcelUtil<SysContact> util = new ExcelUtil<SysContact>(SysContact.class);
         util.exportExcel(response, list, "数据");
     }
-
-    /**
-     * 获取详细信息
-     */
-    @PreAuthorize("@ss.hasPermi('system:contacts:query')")
-    @GetMapping(value = "/{sysContactsId}")
-    public AjaxResult getInfo(@PathVariable("sysContactsId") Long sysContactsId)
-    {
-        return success(sysContactsService.selectSysContactBySysContactId(sysContactsId));
-    }
-
     /**
      * 新增
      */

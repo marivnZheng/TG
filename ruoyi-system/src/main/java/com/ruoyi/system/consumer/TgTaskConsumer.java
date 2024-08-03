@@ -161,13 +161,16 @@ public class TgTaskConsumer{
                                                 }
                                         }
                                         //
-                                        if(myJobDetail.getNextPlanDate()!=null && myJobDetail.getNextPlanDate().getTime()-DateUtils.getNowDate().getTime()<0){
-                                                myJobDetail.setJobDetailDate(DateUtils.getNowDate());
-                                                myJobDetail.setJobDetailStatus(1);
-                                                myJobDetail.setMsg("请求超时");
-                                                myJobDetail.setJobDetailDate(DateUtils.getNowDate());
-                                                myJobMapper.insertMyJobDetail(myJobDetail);
-                                                log.error("任务执行超时,任务详情为+{}",JSON.toJSONString(myJobDetail));
+                                        if(myJobDetail.getNextPlanDate()!=null){
+                                                Date date = DateUtils.addMinutes(myJobDetail.getNextPlanDate(), 1);
+                                                if(date.getTime()-DateUtils.getNowDate().getTime()<0){
+                                                        myJobDetail.setJobDetailDate(DateUtils.getNowDate());
+                                                        myJobDetail.setJobDetailStatus(1);
+                                                        myJobDetail.setMsg("请求超时");
+                                                        myJobDetail.setJobDetailDate(DateUtils.getNowDate());
+                                                        myJobMapper.insertMyJobDetail(myJobDetail);
+                                                        log.error("任务执行超时,任务详情为+{}",JSON.toJSONString(myJobDetail));
+                                                }
                                         }
                                 }else{
                                         myJob.setJobStatus("3");

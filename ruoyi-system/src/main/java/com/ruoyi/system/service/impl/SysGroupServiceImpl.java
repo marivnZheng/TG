@@ -65,18 +65,6 @@ public class SysGroupServiceImpl implements ISysGroupService
 
 
     /**
-     * 查询
-     * 
-     * @param sysGroupId 主键
-     * @return 
-     */
-    @Override
-    public SysGroup selectSysGroupBySysGroupId(Long sysGroupId)
-    {
-        return sysGroupMapper.selectSysGroupBySysGroupId(sysGroupId);
-    }
-
-    /**
      * 查询列表
      * 
      * @param sysGroup 
@@ -149,8 +137,8 @@ public class SysGroupServiceImpl implements ISysGroupService
                     HashMap parms = new HashMap();
                     parms.put("sysAccountStringSession",sysAccountStringSession);
                     try {
-                        log.info("当前账号为：{}，账号为：{}，开始同步好友。",getLoginUser().getUsername(),e.getSysAccountId());
-                        sysGroupMapper.deleteSysContactByAccountId(e.getSysAccountId());
+                        log.info("当前账号为：{}，账号为：{}，开始同步好友。",getLoginUser().getUsername(),sysAccountId);
+                        sysGroupMapper.deleteSysContactByAccountId(sysAccountId);
                         String syncGroup = tgUtil.GenerateCommand("syncGroup", parms);
                         for (String s : syncGroup.split("\n")) {
                             String substring = s.substring(s.indexOf("{"), s.indexOf("}")+1);
@@ -185,7 +173,7 @@ public class SysGroupServiceImpl implements ISysGroupService
         boolean jobFlag=tarNum>1;
         HashMap jobIds = new HashMap();
         SysAccount sysAccount = sysAccountMapper.selectSysAccountBySysAccountId(Long.valueOf(dto.getSysAccountId()));
-        SysGroup sysGroup = sysGroupMapper.selectSysGroupBySysGroupId(Long.valueOf(dto.getGroupId()));
+        SysGroup sysGroup = sysGroupMapper.selectSysGroupBySysGroupId(Long.valueOf(dto.getGroupId()),dto.getSysAccountId());
         if(jobFlag){
             HashMap parms = new HashMap();
             parms.put("sessionString", sysAccount.getSysAccountStringSession());

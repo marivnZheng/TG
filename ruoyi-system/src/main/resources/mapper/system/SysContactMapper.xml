@@ -32,9 +32,9 @@
         </where>
     </select>
 
-    <select id="selectSysContactBySysContactId" parameterType="Long" resultMap="SysContactResult">
+    <select id="selectSysContactBySysContactId"  resultMap="SysContactResult">
         <include refid="selectSysContactVo"/>
-        where sys_contact_id = #{sysContactId}
+        where sys_contact_id = #{sysContactId} and sys_account_id=#{sysAccountId}
     </select>
 
     <select id="selectSysContactBySysAccount" parameterType="Long" resultMap="SysContactResult">
@@ -64,9 +64,6 @@
             <if test="sysStatus != null">#{sysStatus},</if>
             <if test="sysContactPhone != null">#{sysContactPhone},</if>
         </trim>
-        on duplicate key update sys_account_id =#{sysAccountId},sys_account_id=#{sysAccountId},sys_user_id=#{sysUserId},sys_contact_name=#{sysContactName},
-        sys_mutual_contact=#{sysMutualContact},sys_status=#{sysStatus},sys_contact_phone=#{sysContactPhone}
-
     </update >
 
     <update id="updateSysContact" parameterType="SysContact">

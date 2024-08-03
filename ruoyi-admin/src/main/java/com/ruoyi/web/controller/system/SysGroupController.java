@@ -91,16 +91,6 @@ public class SysGroupController extends BaseController
     }
 
     /**
-     * 获取详细信息
-     */
-    @PreAuthorize("@ss.hasPermi('system:group:query')")
-    @GetMapping(value = "/{sysGroupId}")
-    public AjaxResult getInfo(@PathVariable("sysGroupId") Long sysGroupId)
-    {
-        return success(sysGroupService.selectSysGroupBySysGroupId(sysGroupId));
-    }
-
-    /**
      * 新增
      */
     @PreAuthorize("@ss.hasPermi('system:group:add')")

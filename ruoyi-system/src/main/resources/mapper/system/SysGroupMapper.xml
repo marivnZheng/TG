@@ -36,9 +36,9 @@
         </where>
     </select>
 
-    <select id="selectSysGroupBySysGroupId" parameterType="Long" resultMap="SysGroupResult">
+    <select id="selectSysGroupBySysGroupId"  resultMap="SysGroupResult">
         <include refid="selectSysGroupVo"/>
-        where sys_group_id = #{sysGroupId}
+        where sys_group_id = #{sysGroupId} and sys_account_id=#{sysAccountId}
     </select>
 
     <select id="selectSysGroupByAccountString" parameterType="String" resultMap="SysGroupResult">
@@ -71,12 +71,8 @@
             <if test="sysGroupSendMessage != null">#{sysGroupSendMessage},</if>
             <if test="sysGroupInvite != null">#{sysGroupInvite},</if>
             <if test="sysAccountStringSession != null">#{sysAccountStringSession},</if>
-            <if test="sysAccountId != null">sys_account_id,</if>
+            <if test="sysAccountId != null">#{sysAccountId},</if>
         </trim>
-        on duplicate key update sys_group_id =#{sysGroupId},sys_user_id=#{sysUserId},sys_group_title=#{sysGroupTitle},sys_group_link=#{sysGroupLink},
-        sys_account_string_session=#{sysAccountStringSession},
-        sys_account_id=#{sysAccountId},
-        sys_group_detail=#{sysGroupDetail},sys_group_send_photo=#{sysGroupSendPhoto},sys_group_send_message=#{sysGroupSendMessage},sys_group_invite=#{sysGroupInvite}
     </insert>
 
     <update id="updateSysGroup" parameterType="SysGroup">

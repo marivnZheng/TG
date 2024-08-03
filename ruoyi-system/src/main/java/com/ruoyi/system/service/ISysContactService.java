@@ -16,14 +16,6 @@ import com.ruoyi.system.domain.SysContact;
  */
 public interface ISysContactService
 {
-    /**
-     * 查询
-     * 
-     * @param sysContactId 主键
-     * @return 
-     */
-    public SysContact selectSysContactBySysContactId(Long sysContactId);
-
 
 
     public AjaxResult syncContact(List<SysAccount> sysAccountList);

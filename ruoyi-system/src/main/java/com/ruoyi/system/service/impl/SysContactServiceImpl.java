@@ -50,16 +50,7 @@ public class SysContactServiceImpl implements ISysContactService {
     @Autowired
     private MyJobMapper myJobMapper;
 
-    /**
-     * 查询
-     *
-     * @param sysContactId 主键
-     * @return
-     */
-    @Override
-    public SysContact selectSysContactBySysContactId(Long sysContactId) {
-        return sysContactMapper.selectSysContactBySysContactId(sysContactId);
-    }
+
 
 
     @Override

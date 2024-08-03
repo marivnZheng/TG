@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.system.domain.SysContact;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * Mapper接口
@@ -17,7 +18,7 @@ public interface SysContactMapper
      * @param sysContactId 主键
      * @return 
      */
-    public SysContact selectSysContactBySysContactId(Long sysContactId);
+    public SysContact selectSysContactBySysContactId(@Param("sysContactId") Long sysContactId, @Param("sysAccountId")Long sysAccountId);
 
     /**
      * 查询列表

@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.system.domain.SysGroup;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * Mapper接口
@@ -17,7 +18,7 @@ public interface SysGroupMapper
      * @param sysGroupId 主键
      * @return 
      */
-    public SysGroup selectSysGroupBySysGroupId(Long sysGroupId);
+    public SysGroup selectSysGroupBySysGroupId(@Param("sysGroupId") Long sysGroupId,@Param("sysAccountId") Long sysAccountId);
 
 
     public List<SysGroup> selectSysGroupByAccountString(String StringSession);

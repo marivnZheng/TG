@@ -70,8 +70,8 @@ public class SysTaskServiceImpl implements ISysTaskService
     }
 
     @Override
-    public List<MyJobDetail> selectSysTaskDetailList(MyJob job) {
-        return sysTaskMapper.selectSysTaskDetailList(job.getJobId());
+    public List<MyJobDetail> selectSysTaskDetailList(HashMap map) {
+        return sysTaskMapper.selectSysTaskDetailList(Long.valueOf(map.get("jobId").toString()));
     }
 
     @Override
@@ -239,7 +239,7 @@ public class SysTaskServiceImpl implements ISysTaskService
                     ArrayList list =new ArrayList();
                     for (Object sysContactId : syscontacids) {
                         MyJobDetail jobDetail = new MyJobDetail();
-                        SysContact sysContact = sysContactMapper.selectSysContactBySysContactId(Long.valueOf(sysContactId.toString()));
+                        SysContact sysContact = sysContactMapper.selectSysContactBySysContactId(Long.valueOf(sysContactId.toString()),Long.valueOf(mapAccount.get("sysAccountId").toString()));
                         jobDetail.setTarg(sysContact.getSysContactUserName());
                         jobDetail.setTargId(String.valueOf(sysContact.getSysContactId()));
                         jobDetail.setIndex(index);
@@ -284,7 +284,7 @@ public class SysTaskServiceImpl implements ISysTaskService
                     ArrayList list =new ArrayList();
                     for (Object AccountString : groupList) {
                         MyJobDetail jobDetail = new MyJobDetail();
-                        SysGroup sysGroups = sysGroupMapper.selectSysGroupBySysGroupId(Long.valueOf(AccountString.toString()));
+                        SysGroup sysGroups = sysGroupMapper.selectSysGroupBySysGroupId(Long.valueOf(AccountString.toString()),Long.valueOf(mapAccount.get("sysAccountId").toString()));
                         jobDetail.setTarg("https://t.me/"+sysGroups.getSysGroupLink());
                         jobDetail.setTargId(String.valueOf(sysGroups.getSysGroupId()));
                         jobDetail.setIndex(index);
@@ -419,9 +419,10 @@ public class SysTaskServiceImpl implements ISysTaskService
             for (MyJob myJob : myJobs) {
             if(myJob.getOption()==1){
                 //修改任务及明细
-                myJob.setJobStatus("1");
-                myJob.setSuccessNum(0);
-                myJobMapper.insertMyJob(myJob);
+                MyJob updateJob = myJobMapper.selectJobById(myJob.getJobId());
+                updateJob.setJobStatus("1");
+                updateJob.setSuccessNum(0);
+                myJobMapper.insertMyJob(updateJob);
                 List<MyJobDetail> myJobDetails = sysTaskMapper.selectSysTaskDetailList(myJob.getJobId());
                 sysTaskMapper.deleteByJobId(myJob.getJobId());
                 for (MyJobDetail myJobDetail : myJobDetails) {
@@ -432,13 +433,15 @@ public class SysTaskServiceImpl implements ISysTaskService
             }
             //暂停
             else if(myJob.getOption()==2){
+                MyJob updateJob = myJobMapper.selectJobById(myJob.getJobId());
                 myJob.setJobStatus("0");
-                myJobMapper.insertMyJob(myJob);
+                myJobMapper.insertMyJob(updateJob);
             }
             //开始
             else if(myJob.getOption()==3){
-                myJob.setJobStatus("1");
-                myJobMapper.insertMyJob(myJob);
+                MyJob updateJob = myJobMapper.selectJobById(myJob.getJobId());
+                updateJob.setJobStatus("1");
+                myJobMapper.insertMyJob(updateJob);
             }
             }
         }catch (Exception e){

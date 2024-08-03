@@ -1,29 +1,21 @@
 package com.ruoyi.web.controller.system;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.http.HttpServletResponse;
-
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
-import com.ruoyi.framework.web.service.SysRegisterService;
-import com.ruoyi.system.dto.TgLogin;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.system.domain.SysAccount;
-import com.ruoyi.system.service.ISysAccountService;
-import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.framework.web.service.SysRegisterService;
+import com.ruoyi.system.domain.SysAccount;
+import com.ruoyi.system.dto.TgLogin;
+import com.ruoyi.system.service.ISysAccountService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.spring.web.json.Json;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Controller
@@ -59,7 +51,6 @@ public class SysAccountController extends BaseController
     @PostMapping("/ListOnline")
     public TableDataInfo ListOnline(@RequestBody  SysAccount sysAccount)
     {
-        startPage();
         List<SysAccount> list = sysAccountService.selectListOnline(sysAccount);
         return getDataTable(list);
     }

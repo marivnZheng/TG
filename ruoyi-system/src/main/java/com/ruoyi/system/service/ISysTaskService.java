@@ -17,7 +17,7 @@ public interface ISysTaskService
 {
     public List<MyJob> selectSysTaskList(MyJob job);
 
-    public List<MyJobDetail> selectSysTaskDetailList(MyJob job);
+    public List<MyJobDetail> selectSysTaskDetailList(HashMap map);
 
 
     public AjaxResult runTGTask(HashMap map) ;

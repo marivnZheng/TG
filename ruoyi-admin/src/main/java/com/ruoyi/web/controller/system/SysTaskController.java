@@ -60,9 +60,9 @@ public class SysTaskController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:account:list')")
     @PostMapping("/getJobDetail")
-    public List<MyJobDetail> getJobDetail(@RequestBody MyJob myJob)
+    public List<MyJobDetail> getJobDetail(@RequestBody HashMap map)
     {
-        List<MyJobDetail> list = sysTaskService.selectSysTaskDetailList(myJob);
+        List<MyJobDetail> list = sysTaskService.selectSysTaskDetailList(map);
         return list;
     }
 
