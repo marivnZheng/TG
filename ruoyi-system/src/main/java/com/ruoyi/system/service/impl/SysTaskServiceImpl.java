@@ -434,7 +434,7 @@ public class SysTaskServiceImpl implements ISysTaskService
             //暂停
             else if(myJob.getOption()==2){
                 MyJob updateJob = myJobMapper.selectJobById(myJob.getJobId());
-                myJob.setJobStatus("0");
+                updateJob.setJobStatus("0");
                 myJobMapper.insertMyJob(updateJob);
             }
             //开始

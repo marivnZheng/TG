@@ -363,9 +363,8 @@ public class SysAccountServiceImpl implements ISysAccountService
         for (SysAccount sysAccount : list) {
                 HashMap parms = new HashMap();
                 parms.put("sessionString",sysAccount.getSysAccountStringSession());
-            String loginBySessionFile=  tgUtil.GenerateCommand("syncAccount", parms);
-            for (String s : loginBySessionFile.split("\n")) {
-                String substring = s.substring(s.indexOf("{"), s.indexOf("}")+1);
+                String loginBySessionFile=  tgUtil.GenerateCommand("syncAccount", parms);
+                String substring = loginBySessionFile.substring(loginBySessionFile.indexOf("{"), loginBySessionFile.indexOf("}")+1);
                 Map map = JSON.parseObject(tgUtil.decodeJson(substring), Map.class);
                 Integer concatNumber =(Integer) map.get("concatNumber");
                 Integer groupNumber = (Integer) map.get("groupNumber");
@@ -382,9 +381,10 @@ public class SysAccountServiceImpl implements ISysAccountService
                 sysAccount.setSysAccountLastName((String)map.get("lastname"));
                 sysAccount.setSysAccountAbout((String)map.get("about"));
                 sysAccountMapper.updateSysAccount(sysAccount);
-
-            }
-            }
+                String sessionString=(String)map.get("sessionString");
+                syncContact(sessionString,sysAccount.getSysAccountId(),getLoginUser().getUser());
+                syncGroup(sessionString,sysAccount.getSysAccountId(),getLoginUser().getUser());
+        }
 
          return success();
     }

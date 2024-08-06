@@ -17,9 +17,9 @@ client.connect()
 try:
     channel = client.get_entity(targetUser)
     if filePath != "None":
-        client.send_file(channel, filePath, caption=message)
+        client.send_file(channel, filePath, caption=message,parse_mode='html')
     else:
-        message = client.send_message(channel, message)
+        message = client.send_message(channel, message,parse_mode='html')
 
     print("{" + '"code":"{}","msg":"{}"'.format(200, "发送成功") + "}")
 except Exception as e:
