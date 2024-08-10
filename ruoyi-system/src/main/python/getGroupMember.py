@@ -6,6 +6,7 @@ from myContact import myContact
 import json
 from telethon import TelegramClient, sync
 from telethon.sessions import StringSession
+from telethon.errors import UserDeactivatedBanError
 from telethon.tl.types import InputPeerChannel, PeerChannel
 from json import JSONEncoder
 
@@ -31,5 +32,7 @@ try:
         print(json.dumps(
             myContact(i.username, mutualContact, i.phone, deleted, i.first_name, i.last_name,
                       str(i.id)).__dict__).encode('UTF-8'))
+except UserDeactivatedBanError as e:
+    print("{" + '"code":"{}","msg":"{}"'.format(444, "账号已经封禁") + "}")
 except Exception as e:
     print("{"+'"code":"{}","msg":"{}"'.format(400,e)+"}")

@@ -1,16 +1,21 @@
 package com.ruoyi.system.runnable;
 
 import com.alibaba.fastjson2.JSON;
+import com.ruoyi.common.domain.MyJob;
 import com.ruoyi.common.domain.MyJobDetail;
 import com.ruoyi.common.mapper.MyJobMapper;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.system.mapper.SysTaskMapper;
 import com.ruoyi.system.util.TGUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class InvoteGroupRunnable implements Runnable {
 
     private String parms;
@@ -22,11 +27,14 @@ public class InvoteGroupRunnable implements Runnable {
 
     private boolean lastFlag;
 
-    public InvoteGroupRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper, Boolean lastFlag) {
+    private MyJob myJob;
+
+    public InvoteGroupRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper, Boolean lastFlag,MyJob myJob) {
         this.parms = parms;
         this.myJobDetail = myJobDetail;
         this.myJobMapper =myJobMapper;
         this.lastFlag=lastFlag;
+        this.myJob=myJob;
     }
 
     public InvoteGroupRunnable() {
@@ -50,6 +58,11 @@ public class InvoteGroupRunnable implements Runnable {
                 }
                 myJobMapper.insertMyJobDetail(myJobDetail);
             }else{
+                if(resultMap.get("code").equals("444")){
+                    log.error("该账号已经封禁");
+                    myJob.setJobStatus("0");
+                    myJobMapper.insertMyJob(myJob);
+                }
                 myJobDetail.setJobDetailDate(DateUtils.getNowDate());
                 myJobDetail.setJobDetailStatus(1);
                 myJobDetail.setMsg((String) resultMap.get("msg"));

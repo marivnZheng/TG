@@ -366,6 +366,12 @@ public class SysAccountServiceImpl implements ISysAccountService
                 String loginBySessionFile=  tgUtil.GenerateCommand("syncAccount", parms);
                 String substring = loginBySessionFile.substring(loginBySessionFile.indexOf("{"), loginBySessionFile.indexOf("}")+1);
                 Map map = JSON.parseObject(tgUtil.decodeJson(substring), Map.class);
+                if(map.containsKey("code")&&StringUtils.equals(map.get("code").toString(),"444")){
+                        // the use is delete
+                    sysAccount.setSysAccountLoginStatus(1L);
+                    sysAccountMapper.updateSysAccount(sysAccount);
+                    return new AjaxResult(444,"该账号已经封禁");
+                }
                 Integer concatNumber =(Integer) map.get("concatNumber");
                 Integer groupNumber = (Integer) map.get("groupNumber");
                 sysAccount.setSysAccountConcatsNumber(concatNumber.longValue());

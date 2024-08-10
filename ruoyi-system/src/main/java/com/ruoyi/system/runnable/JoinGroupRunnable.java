@@ -9,14 +9,12 @@ import com.ruoyi.common.utils.DateUtils;
 
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysAccount;
+import com.ruoyi.system.mapper.SysTaskMapper;
 import com.ruoyi.system.util.TGUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -53,7 +51,6 @@ public class JoinGroupRunnable implements Runnable {
             String s = result.replaceAll("\\\\", "_");
             if(!TGUtil.isJsonString(s)){
                 myJobDetail.setJobDetailDate(DateUtils.getNowDate());
-                waitTask();
                 myJobDetail.setJobDetailStatus(1);
                 myJobDetail.setMsg("未知错误");
                 myJobMapper.insertMyJobDetail(myJobDetail);
@@ -62,13 +59,17 @@ public class JoinGroupRunnable implements Runnable {
             Map resultMap = JSON.parseObject(s, Map.class);
             if(resultMap.get("code").equals("200")){
                 myJobDetail.setJobDetailDate(DateUtils.getNowDate());
-                waitTask();
+                countNextPlanDate();
                 myJobDetail.setJobDetailStatus(0);
                 myJobMapper.updateMyJob(myJobDetail.getJobId());
                 myJobMapper.insertMyJobDetail(myJobDetail);
             }else{
+                if(resultMap.get("code").equals("444")){
+                    log.error("该账号已经封禁");
+                    myJob.setJobStatus("0");
+                    myJobMapper.insertMyJob(myJob);
+                }
                 myJobDetail.setJobDetailDate(DateUtils.getNowDate());
-                waitTask();
                 myJobDetail.setJobDetailStatus(1);
                 myJobDetail.setMsg((String) resultMap.get("msg"));
                 myJobMapper.updateMyJobFail(myJobDetail.getJobId());
@@ -76,7 +77,6 @@ public class JoinGroupRunnable implements Runnable {
             }
         }catch (Exception e){
             myJobDetail.setJobDetailDate(DateUtils.getNowDate());
-            waitTask();
             myJobDetail.setJobDetailStatus(1);
             myJobDetail.setMsg("未知错误");
             myJobDetail.setJobDetailDate(DateUtils.getNowDate());
@@ -88,20 +88,30 @@ public class JoinGroupRunnable implements Runnable {
 
         }
 
-    private void waitTask(){
-        int  intervals=Integer.valueOf(myJob.getIntervals());
-        String intervalsUnit = String.valueOf(myJob.getIntervalsUnit()) ;
-        try {
-            if(intervalsUnit.equals("0")){
-                TimeUnit.SECONDS.sleep(intervals);
-            }else{
-                TimeUnit.MINUTES.sleep(intervals);
+
+    private void countNextPlanDate(){
+        Integer tarNum = myJob.getTarNum();
+        int index = myJobDetail.getIndex();
+        Date nextPlanDate=new Date();
+        //不是最后一个任务计算下一个任务计划执行时间
+        if(index<tarNum){
+            String intervals = myJob.getIntervals();
+            int intervalsUnit = myJob.getIntervalsUnit();
+            Date nowDate = DateUtils.getNowDate();
+            if(intervalsUnit==1){
+                //循环间隔为分钟
+                nextPlanDate  = DateUtils.addMinutes(nowDate, Integer.valueOf(intervals));
+            }else if(intervalsUnit==2){
+                //循环间隔为小时
+                nextPlanDate = DateUtils.addHours(nowDate, Integer.valueOf(intervals));
+            }else if (intervalsUnit==0){
+                nextPlanDate = DateUtils.addSeconds(nowDate, Integer.valueOf(intervals));
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            myJobMapper.updateJobDetailStatus(nextPlanDate,myJobDetail.getJobId(),index+1);
         }
 
     }
+
 
 }
 

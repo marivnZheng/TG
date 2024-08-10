@@ -28,10 +28,6 @@ if  client.is_user_authorized():
     result = "{"+'"code":"{}","msg":{}'.format(200,json.dumps(loginEntity.__dict__))+"}"
     sys.stdout.flush()
     r.set(sessionPath, result)
-    @client.on(events.NewMessage(pattern='/start'))
-    async def handler(event):
-        if 'Telegram' in event.sender.username:
-            await event.respond('Yes, this was me.')
     client.run_until_disconnected()
 
 else :

@@ -2,6 +2,7 @@ import sys
 
 import socks
 import telethon
+from telethon.errors import UserDeactivatedBanError
 from telethon import TelegramClient,sync
 from telethon.sessions import StringSession
 
@@ -23,7 +24,8 @@ try:
     else:
         result = client.send_message(user, message,parse_mode='html')
         print("{"+'"code":"{}","msg":"{}"'.format(200,"发送成功")+"}")
+except UserDeactivatedBanError as e:
+    print("{" + '"code":"{}","msg":"{}"'.format(444, "账号已经封禁") + "}")
 except Exception as e:
-
     print("{"+'"code":"{}","msg":"{}"'.format(400, e)+"}")
 

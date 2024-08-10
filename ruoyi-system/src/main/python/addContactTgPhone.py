@@ -4,6 +4,7 @@ from json import JSONEncoder
 
 import socks
 
+from telethon.errors import UserDeactivatedBanError
 from myContact import myContact
 from telethon import TelegramClient,sync
 from telethon.sessions import StringSession
@@ -39,6 +40,8 @@ try:
             if str(contact.deleted) == "False" :
                 deleted='1'
                 print("{"+'"code":"{}","msg":{}'.format(200,json.dumps(myContact(contact.username,mutualContact,contact.phone,deleted,contact.first_name,contact.last_name,str(contact.id)).__dict__))+"}")
+except UserDeactivatedBanError as e:
+    print("{" + '"code":"{}","msg":"{}"'.format(444, "账号已经封禁") + "}")
 except Exception as e:
     print("{"+'"code":"{}","msg":"{}"'.format(400,e.args[0].replace('"','_').replace('\\',"_"))+"}")
 

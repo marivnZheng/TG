@@ -10,21 +10,20 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SysTaskMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
@@ -95,7 +94,14 @@ public class TgTaskConsumer{
 
                                 }else{
                                         log.info("执行任务详情：{}",JSON.toJSONString(myJobDetail));
-                                        setNextPlanDate(myJobDetail,myJob);
+                                        //判断是否到达执行时间
+                                        if(myJobDetail.getNextPlanDate()!=null){
+                                                if(myJobDetail.getNextPlanDate().getTime()-DateUtils.getNowDate().getTime()<0){
+                                                        setNextPlanDate(myJobDetail,myJob);
+                                                }
+                                        }else{
+                                                setNextPlanDate(myJobDetail,myJob);
+                                        }
                                 }
 
                         }else{
@@ -103,7 +109,14 @@ public class TgTaskConsumer{
                                 MyJobDetail myJobDetail = sysTaskMapper.selectSysTaskDetailListOrderByIndex(myJob.getJobId());
                                 log.info("执行任务详情：{}",JSON.toJSONString(myJobDetail));
                                 if(myJobDetail!=null){
-                                        setNextPlanDate(myJobDetail,myJob);
+                                        //判断是否到达执行时间
+                                        if(myJobDetail.getNextPlanDate()!=null){
+                                                if(myJobDetail.getNextPlanDate().getTime()-DateUtils.getNowDate().getTime()<0||myJobDetail.getNextPlanDate()==null){
+                                                        setNextPlanDate(myJobDetail,myJob);
+                                                }
+                                        }else{
+                                                setNextPlanDate(myJobDetail,myJob);
+                                        }
                                 }else{
                                         myJob.setJobStatus("3");
                                         myJobMapper.insertMyJob(myJob);
@@ -117,35 +130,14 @@ public class TgTaskConsumer{
         public void setNextPlanDate(MyJobDetail myJobDetail,MyJob myJob) throws IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException, NoSuchMethodException{
                 String parms = myJob.getParms();
                 if(myJobDetail.getJobDetailStatus()!=-2){
-                        String intervals = myJob.getIntervals();
-                        int intervalsUnit = myJob.getIntervalsUnit();
-                        Date nowDate = DateUtils.getNowDate();
-                        if(intervalsUnit==1){
-                                //循环间隔为分钟
-                                Date nextPlanDate = DateUtils.addMinutes(nowDate, Integer.valueOf(intervals));
-                                int i = myJobMapper.updateStatus(-2, myJobDetail.getJobDetailId(),nextPlanDate);
-                                if(i>0){
-                                        log.info("执行任务类型为：{}",myJobDetail.getTaskClass());
-                                        exec(parms,myJobDetail,myJob);
-                                }
-                        }else if(intervalsUnit==2){
-                                //循环间隔为小时
-                                Date nextPlanDate = DateUtils.addHours(nowDate, Integer.valueOf(intervals));
-                                int i = myJobMapper.updateStatus(-2, myJobDetail.getJobDetailId(),nextPlanDate);
-                                if(i>0){
-                                        log.info("执行任务类型为：{}",myJobDetail.getTaskClass());
-                                        exec(parms,myJobDetail,myJob);
-                                }
-                        }else if (intervalsUnit==0){
-                                Date nextPlanDate = DateUtils.addSeconds(nowDate, Integer.valueOf(intervals));
-                                int i = myJobMapper.updateStatus(-2, myJobDetail.getJobDetailId(),nextPlanDate);
+                        if(myJobDetail.getNextPlanDate()==null||myJobDetail.getNextPlanDate().getTime()-DateUtils.getNowDate().getTime()<0){
+                                int i = myJobMapper.updateStatus( myJobDetail.getJobDetailId());
                                 if(i>0){
                                         log.info("执行任务类型为：{}",myJobDetail.getTaskClass());
                                         exec(parms,myJobDetail,myJob);
                                 }
                         }
                 }
-                //
                 if(myJobDetail.getNextPlanDate()!=null){
                         Date date = DateUtils.addMinutes(myJobDetail.getNextPlanDate(), 1);
                         if(date.getTime()-DateUtils.getNowDate().getTime()<0){
@@ -156,6 +148,24 @@ public class TgTaskConsumer{
                                 myJobMapper.insertMyJobDetail(myJobDetail);
                                 log.error("任务执行超时,任务详情为+{}",JSON.toJSONString(myJobDetail));
                         }
+                }else{
+                        String intervals = myJob.getIntervals();
+                        int intervalsUnit = myJob.getIntervalsUnit();
+                        Date nowDate = DateUtils.getNowDate();
+                        if(intervalsUnit==1){
+                                //循环间隔为分钟
+                                Date nextPlanDate = DateUtils.addMinutes(nowDate, Integer.valueOf(intervals));
+                                myJobMapper.updateJobDetailStatus(nextPlanDate,myJobDetail.getJobId(),myJobDetail.getIndex());
+                        }else if(intervalsUnit==2){
+                                //循环间隔为小时
+                                Date nextPlanDate = DateUtils.addHours(nowDate, Integer.valueOf(intervals));
+                                myJobMapper.updateJobDetailStatus(nextPlanDate,myJobDetail.getJobId(),myJobDetail.getIndex());
+                        }else if (intervalsUnit==0){
+                                Date nextPlanDate = DateUtils.addSeconds(nowDate, Integer.valueOf(intervals));
+                                myJobMapper.updateJobDetailStatus(nextPlanDate,myJobDetail.getJobId(),myJobDetail.getIndex());
+
+                        }
+
                 }
         }
 

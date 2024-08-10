@@ -33,12 +33,20 @@ public interface MyJobMapper
     public MyJob selectJobById(@Param("jobId") long jobId);
 
 
+    public MyJobDetail selectJobDetailById(@Param("jobDetailId") long jobId);
+
+
     public int updateMyJobAndStatusFail(long jobId);
 
     public int batchMyJobDetail(List<MyJobDetail> list);
 
     public int insertMyJobDetail(MyJobDetail job);
 
+    public int updateJobDetailStatus(@Param("nextPlanDate") Date date,@Param("jobId")Long jobId,@Param("index") int index);
 
-    public int updateStatus(@Param("status") int status, @Param("jobDetailId")Long jobDetailId, @Param("nextPlanDate")Date nextPlanDate);
+
+    public int updateStatus(@Param("jobDetailId")Long jobDetailId);
+
+
+
 }

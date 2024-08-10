@@ -36,7 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="taskClass"    column="my_job_detail_task_class"    />
 		<result property="index"    column="my_job_detail_index"    />
 		<result property="targId"    column="my_job_detail_targ_id"    />
-
+		<result property="nextPlanDate"    column="my_job_detail_next_plan_date"    />
 	</resultMap>
 
 
@@ -100,9 +100,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		update my_job a set a.succes_num=a.succes_num+1,a.job_status=3  where job_id =#{jobId} and a.job_status !=0
 	</update>
 
+	<update id="updateStatusAndNextPlanDate"  >
+		update my_job_detail a set a.my_job_detail_status=-2 ,a.my_job_detail_next_plan_date=#{nextPlanDate}   where my_job_detail_id =#{jobDetailId}
+	</update>
+
+	<update id="updateJobDetailStatus" >
+		update my_job_detail set my_job_detail_next_plan_date = #{nextPlanDate} where my_job_id = #{jobId} and my_job_detail_index =#{index}
+	</update>
 
 	<update id="updateStatus"  >
-		update my_job_detail a set a.my_job_detail_status=-2 ,a.my_job_detail_next_plan_date=#{nextPlanDate}   where my_job_detail_id =#{jobDetailId}
+		update my_job_detail a set a.my_job_detail_status=-2   where my_job_detail_id =#{jobDetailId}
 	</update>
 	<update id="updateMyJobMessageGroup">
 		update my_job a set a.parms=#{parms} where job_id =#{jobId}
@@ -114,6 +121,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<select id="selectJobById" parameterType="Long" resultMap="SysTaskResult">
 		select * from my_job where job_id=#{jobId}
+	</select>
+
+
+	<select id="selectJobDetailById" parameterType="Long" resultMap="SysTaskDetailResult">
+		select * from my_job where job_id=#{jobDetailId}
 	</select>
 
 

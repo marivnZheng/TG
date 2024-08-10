@@ -4,6 +4,7 @@ import socks
 from telethon.tl.types import ChatBannedRights
 from myGroup import myGroup
 import json
+from telethon.errors import UserDeactivatedBanError
 from telethon import TelegramClient, sync
 from telethon.sessions import StringSession
 from json import JSONEncoder
@@ -68,6 +69,8 @@ for d in client.iter_dialogs():
             else:
                 print(json.dumps(
                     myGroup(link, inviteUsers, sendPhotos, sendMessages, is_group, id, title).__dict__).encode('utf-8'))
+    except UserDeactivatedBanError as e:
+        print("{" + '"code":"{}","msg":"{}"'.format(444, "账号已经封禁") + "}")
     except Exception as e:
         print("{"+'"code":"{}","msg":"{}"'.format(400,e)+"}")
 

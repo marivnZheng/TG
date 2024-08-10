@@ -36,10 +36,6 @@ if not client.is_user_authorized():
         loginEntity = initLoginEntity(phone, phone, MySession,ContactNum, groupnum,result.username,result.first_name,result.last_name,full.full_user.about)
         result = "{" + '"code":"{}","msg":{}'.format(200, json.dumps(loginEntity.__dict__)) + "}"
         r.set(phone, result)
-        @client.on(events.NewMessage(pattern='/start'))
-        async def handler(event):
-            if 'Telegram' in event.sender.username:
-                await event.respond('Yes, this was me.')
         client.run_until_disconnected()
     except Exception as e:
         result = "{"+'"code":"{}","msg":"{}"'.format(400,e)+"}"

@@ -107,10 +107,11 @@
             <if test="sysAccountCreateTime != null">sys_account_create_time = #{sysAccountCreateTime},</if>
             <if test="sysAccountCreateTimezone != null">sys_account_create_timeZone = #{sysAccountCreateTimezone},</if>
             <if test="sysAccountOnline != null">sys_account_online = #{sysAccountOnline},</if>
-            sys_account_name = #{sysAccountName},
-            sys_account_about = #{sysAccountAbout},
-            sys_account_first_name = #{sysAccountFirstName},
-            sys_account_last_name = #{sysAccountLastName},
+            <if test="sysAccountName != null">sys_account_name = #{sysAccountName},</if>
+            <if test="sysAccountAbout != null">sys_account_about = #{sysAccountAbout},</if>
+            <if test="sysAccountFirstName != null">sys_account_first_name = #{sysAccountFirstName},</if>
+            <if test="sysAccountLoginStatus != null">sys_account_login_status = #{sysAccountLoginStatus},</if>
+            <if test="sysAccountLastName != null">sys_account_last_name = #{sysAccountLastName},</if>
         </trim>
         where sys_account_id = #{sysAccountId}
     </update>

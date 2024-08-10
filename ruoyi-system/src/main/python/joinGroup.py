@@ -3,6 +3,7 @@ import json
 import sys
 from json import JSONEncoder
 
+from telethon.errors import UserDeactivatedBanError
 import socks
 from telethon import TelegramClient,sync
 from telethon.sessions import StringSession
@@ -21,6 +22,8 @@ try:
     var =client.get_entity(link)
     client(JoinChannelRequest(var))
     print("{"+'"code":"{}","msg":"{}"'.format(200, "成功加入")+"}")
+except UserDeactivatedBanError as e:
+    print("{" + '"code":"{}","msg":"{}"'.format(444, "账号已经封禁") + "}")
 except Exception as e:
     print("{"+'"code":"{}","msg":"{}"'.format(400, e)+"}")
 

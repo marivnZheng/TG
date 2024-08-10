@@ -6,7 +6,7 @@ from json import JSONEncoder
 import socks
 import telethon
 from telethon.tl.functions.account import UpdateProfileRequest, UpdateUsernameRequest
-
+from telethon.errors import UserDeactivatedBanError
 from TGHelper import getContactNum, getGroupNumber, initLoginEntity
 from telethon import TelegramClient
 from telethon.sessions import StringSession
@@ -27,5 +27,7 @@ client.connect()
 try:
     client(UpdateUsernameRequest(userName))
     print("{" + '"code":"{}","msg":"{}"'.format(200, "成功修改") + "}")
+except UserDeactivatedBanError as e:
+    print("{" + '"code":"{}","msg":"{}"'.format(444, "账号已经封禁") + "}")
 except Exception as e:
     print("{" + '"code":"{}","msg":"{}"'.format(400, e) + "}")

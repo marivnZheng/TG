@@ -361,51 +361,69 @@ public class SysTaskServiceImpl implements ISysTaskService
                 }
                 List<List<MyJobDetail>> partition = ListUtil.partition(listJobDetail, 100);
                 partition.forEach(e -> myJobMapper.batchMyJobDetail(e));
-                return success();
             }
         }else{
-            for (Map account : accountList) {
-                String sysAccountStringSession = (String)account.get("sysAccountStringSession");
-                tarNum=list.size();
+
+
+            Map<Long, List<String>> sysAccountMap = new HashMap<>();
+            int mapIndex =0;
+            for (String link:list){
+                Map sysAccount = accountList.get(mapIndex);
+                Long sysAccountId = Long.valueOf(sysAccount.get("sysAccountId").toString());
+                if (sysAccountMap.containsKey(sysAccountId)) {
+                    List<String> listLink =  sysAccountMap.get(sysAccountId);
+                    listLink.add(link);
+                } else {
+                    List<String> listLink = new ArrayList<>();
+                    listLink.add(link);
+                    sysAccountMap.put(sysAccountId, listLink);
+                }
+                mapIndex++;
+                if(mapIndex==accountList.size()){
+                    mapIndex=0;
+                }
+            }
+            for (Map account :accountList){
+                Long sysAccountId = Long.valueOf(account.get("sysAccountId").toString());
+                List<String> accountLinkList = sysAccountMap.get(sysAccountId);
                 HashMap parms = new HashMap();
+                MyJob job = new MyJob();
                 parms.put("sessionPath",account.get("sysAccountStringSession"));
                 parms.put("messageGroup",map.get("messageGroup"));
                 parms.put("sendIndex",0);
                 parms.put("endTime",map.get("endTime"));
+                parms.put("isVip",accountDetailId>1?true:false);
                 parms.put("startTime",map.get("startTime"));
                 parms.put("endDate",map.get("endDate"));
-                parms.put("isVip",accountDetailId>1?true:false);
-                MyJob myJob = new MyJob();
-                myJob.setIntervals(onceMin+"");
-                myJob.setIntervalsUnit(Integer.valueOf(onceType));
-                myJob.setJobName("发送信息给用户");
-                myJob.setJobType("1");
-                myJob.setTarNum(tarNum);
-                myJob.setParms(JSON.toJSONString(parms));
-                myJob.setJobClass("com.ruoyi.system.runnable.sendMessageContactRunnable");
-                myJob.setCreateDate(DateUtils.getNowDate());
-                myJob.setJobGroup(String.valueOf(longTime));
+                job.setTarNum(accountLinkList.size());
+                job.setJobType("1");
+                job.setJobName("发送信息给用户");
+                job.setIntervals(onceMin+"");
+                job.setIntervalsUnit(Integer.valueOf(onceType));
+                job.setParms(JSON.toJSONString(parms));
+                job.setCreateDate(DateUtils.getNowDate());
+                job.setUserId(getLoginUser().getUserId());
                 String name = (String) account.get("TgName");
-                myJob.setSysAccountName(name);
-                myJob.setUserId(getLoginUser().getUserId());
-                myJobMapper.insertMyJob(myJob);
+                job.setJobGroup(String.valueOf(longTime));
+                job.setSysAccountName(name);
+                job.setCreateDate(DateUtils.getNowDate());
+                job.setJobClass("com.ruoyi.system.runnable.sendMessageContactRunnable");
+                myJobMapper.insertMyJob(job);
                 int index =1;
-                ArrayList listJobDetail =new ArrayList();
-                for (String userName  : list) {
+                ArrayList listDetail = new ArrayList();
+                for (String link : accountLinkList) {
                     MyJobDetail jobDetail = new MyJobDetail();
-                    jobDetail.setTarg(userName);
+                    jobDetail.setTarg(link);
                     jobDetail.setIndex(index);
-                    jobDetail.setJobId(myJob.getJobId());
+                    jobDetail.setJobId(job.getJobId());
                     jobDetail.setTaskClass("com.ruoyi.system.runnable.sendMessageContactRunnable");
                     jobDetail.setJobDetailStatus(-1);
-                    listJobDetail.add(jobDetail);
+                    listDetail.add(jobDetail);
                     index++;
                 }
-                List<List<MyJobDetail>> partition = ListUtil.partition(listJobDetail, 100);
+                List<List<MyJobDetail>> partition = ListUtil.partition(listDetail, 100);
                 partition.forEach(e -> myJobMapper.batchMyJobDetail(e));
-                return success();
             }
-
             return  success();
 
         }

@@ -2,7 +2,7 @@ import sys
 
 import socks
 from telethon.tl.functions.users import GetFullUserRequest
-
+from telethon.errors import UserDeactivatedBanError
 from TGHelper import getContactNum, getGroupNumber, initLoginEntity
 from myContact import myContact
 import json
@@ -20,12 +20,16 @@ client = TelegramClient(StringSession(sessionPath), api_id, api_hash,system_vers
 client.connect()
 try:
     result = client.get_me()
-    full =  client(GetFullUserRequest(result))
-    ContactNum = getContactNum(client)
-    groupnum = getGroupNumber(client)
-    loginEntity = initLoginEntity(result.phone, result.phone, sessionPath,ContactNum, groupnum,result.username,result.first_name,result.last_name,full.full_user.about)
-
-    print(json.dumps(loginEntity.__dict__).encode("UTF-8"))
+    if result == None:
+        print("{" + '"code":"{}","msg":"{}"'.format(444, "账号已经封禁") + "}")
+    else :
+        full =  client(GetFullUserRequest(result))
+        ContactNum = getContactNum(client)
+        groupnum = getGroupNumber(client)
+        loginEntity = initLoginEntity(result.phone, result.phone, sessionPath,ContactNum, groupnum,result.username,result.first_name,result.last_name,full.full_user.about)
+        print(json.dumps(loginEntity.__dict__).encode("UTF-8"))
+except UserDeactivatedBanError as e:
+    print("{" + '"code":"{}","msg":"{}"'.format(444, e) + "}")
 except Exception as e:
     print("{"+'"code":"{}","msg":"{}"'.format(400,e)+"}")
 
