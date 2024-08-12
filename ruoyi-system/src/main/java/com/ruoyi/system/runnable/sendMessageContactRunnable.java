@@ -28,19 +28,21 @@ public class sendMessageContactRunnable implements Runnable {
 
     private MyJob myJob;
 
-    public sendMessageContactRunnable(String parms,MyJobDetail myJobDetail,MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob) {
+    private  TGUtil tgUtil;
+
+    public sendMessageContactRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob,TGUtil tgUtil) {
         this.parms = parms;
-        this.myJobDetail=myJobDetail;
-        this.myJobMapper=myJobMapper;
+        this.myJobDetail = myJobDetail;
+        this.myJobMapper =myJobMapper;
         this.lastFlag=lastFlag;
         this.myJob=myJob;
+        this.tgUtil=tgUtil;
     }
     public sendMessageContactRunnable() {
 
     }
     @Override
     public void run() {
-        TGUtil tgUtil = new TGUtil();
         HashMap map = JSON.parseObject(parms, HashMap.class);
         String forWordMessage = (String) map.get("forWordMessage");
         //进入转发逻辑
@@ -116,10 +118,12 @@ public class sendMessageContactRunnable implements Runnable {
                     log.error("该账号已经封禁");
                     myJob.setJobStatus("0");
                     myJobMapper.insertMyJob(myJob);
+                    myJobDetail.setMsg("该账号已经封禁");
+                }else{
+                    myJobDetail.setMsg((String) resultMap.get("msg"));
                 }
                 myJobDetail.setJobDetailDate(DateUtils.getNowDate());
                 myJobDetail.setJobDetailStatus(1);
-                myJobDetail.setMsg((String) resultMap.get("msg"));
                 if(lastFlag){         //最后一组数据
                     if(messageGroupList.size()==sendIndex+1){
                         //判断是否循环，设置下次进行计划时间

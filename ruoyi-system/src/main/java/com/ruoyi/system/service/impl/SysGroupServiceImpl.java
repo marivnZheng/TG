@@ -1,18 +1,9 @@
 package com.ruoyi.system.service.impl;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.core.domain.AjaxResult;
-
 import com.ruoyi.common.domain.MyJob;
 import com.ruoyi.common.domain.MyJobDetail;
 import com.ruoyi.common.mapper.MyJobMapper;
@@ -21,19 +12,22 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.InviteGroupDTO;
 import com.ruoyi.system.domain.SysAccount;
 import com.ruoyi.system.domain.SysContact;
+import com.ruoyi.system.domain.SysGroup;
 import com.ruoyi.system.mapper.SysAccountMapper;
 import com.ruoyi.system.mapper.SysContactMapper;
-import com.ruoyi.system.runnable.InvoteGroupRunnable;
-import com.ruoyi.system.runnable.JoinGroupRunnable;
-import com.ruoyi.system.runnable.addContactRunnable;
+import com.ruoyi.system.mapper.SysGroupMapper;
+import com.ruoyi.system.service.ISysGroupService;
 import com.ruoyi.system.util.TGUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.system.mapper.SysGroupMapper;
-import com.ruoyi.system.domain.SysGroup;
-import com.ruoyi.system.service.ISysGroupService;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.ruoyi.common.core.domain.AjaxResult.success;
 import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
@@ -309,6 +303,7 @@ public class SysGroupServiceImpl implements ISysGroupService
                 for (SysAccount account :sysAccounts){
                     List<String> accountLinkList = sysAccountMap.get(account.getSysAccountId());
                     MyJob job = new MyJob();
+                    index =0;
                     job.setTarNum(accountLinkList.size());
                     job.setJobType("1");
                     job.setJobName("群链接添加群组");

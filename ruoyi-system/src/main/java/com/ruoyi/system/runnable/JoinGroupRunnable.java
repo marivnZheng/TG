@@ -30,12 +30,15 @@ public class JoinGroupRunnable implements Runnable {
 
     private MyJob myJob;
 
-    public JoinGroupRunnable(String parms,MyJobDetail myJobDetail,MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob) {
+    private TGUtil tgUtil;
+
+    public JoinGroupRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob,TGUtil tgUtil) {
         this.parms = parms;
-        this.myJobDetail=myJobDetail;
-        this.myJobMapper=myJobMapper;
+        this.myJobDetail = myJobDetail;
+        this.myJobMapper =myJobMapper;
         this.lastFlag=lastFlag;
         this.myJob=myJob;
+        this.tgUtil=tgUtil;
     }
 
     public JoinGroupRunnable() {
@@ -43,7 +46,6 @@ public class JoinGroupRunnable implements Runnable {
     }
     @Override
     public void run() {
-        TGUtil tgUtil = new TGUtil();
         HashMap map = JSON.parseObject(parms, HashMap.class);
         try {
             map.put("link", StringUtils.isNotEmpty(myJobDetail.getTarg())?myJobDetail.getTarg():myJobDetail.getTargId());
@@ -68,10 +70,12 @@ public class JoinGroupRunnable implements Runnable {
                     log.error("该账号已经封禁");
                     myJob.setJobStatus("0");
                     myJobMapper.insertMyJob(myJob);
+                    myJobDetail.setMsg("该账号已经封禁");
+                }else{
+                    myJobDetail.setMsg((String) resultMap.get("msg"));
                 }
                 myJobDetail.setJobDetailDate(DateUtils.getNowDate());
                 myJobDetail.setJobDetailStatus(1);
-                myJobDetail.setMsg((String) resultMap.get("msg"));
                 myJobMapper.updateMyJobFail(myJobDetail.getJobId());
                 myJobMapper.insertMyJobDetail(myJobDetail);
             }

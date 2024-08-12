@@ -8,6 +8,7 @@ import com.ruoyi.common.mapper.MyJobMapper;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SysTaskMapper;
+import com.ruoyi.system.util.TGUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +37,9 @@ public class TgTaskConsumer{
 
         @Autowired
         private MyJobMapper myJobMapper;
+
+        @Autowired
+        private TGUtil tgUtil;
 
         private ExecutorService executor = Executors.newCachedThreadPool() ;
 
@@ -77,7 +81,6 @@ public class TgTaskConsumer{
                                                 }
                                         }
                                         //比对计划是否到达计划时间，是则创建任务
-
                                         if(myJob.getPlanDate()!=null && myJob.getPlanDate().getTime()-DateUtils.getNowDate().getTime()<0){
                                                 //大于计划时间，设置任务
                                                 myJob.setJobStatus("1");
@@ -91,7 +94,6 @@ public class TgTaskConsumer{
                                                 List<List<MyJobDetail>> partition = ListUtil.partition(myJobDetails, 100);
                                                 partition.forEach(list -> myJobMapper.batchMyJobDetail(list));
                                         }
-
                                 }else{
                                         log.info("执行任务详情：{}",JSON.toJSONString(myJobDetail));
                                         //判断是否到达执行时间
@@ -103,9 +105,7 @@ public class TgTaskConsumer{
                                                 setNextPlanDate(myJobDetail,myJob);
                                         }
                                 }
-
                         }else{
-
                                 MyJobDetail myJobDetail = sysTaskMapper.selectSysTaskDetailListOrderByIndex(myJob.getJobId());
                                 log.info("执行任务详情：{}",JSON.toJSONString(myJobDetail));
                                 if(myJobDetail!=null){
@@ -122,15 +122,13 @@ public class TgTaskConsumer{
                                         myJobMapper.insertMyJob(myJob);
                                 }
                         }
-
-
                 }
         }
 
         public void setNextPlanDate(MyJobDetail myJobDetail,MyJob myJob) throws IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException, NoSuchMethodException{
                 String parms = myJob.getParms();
-                if(myJobDetail.getJobDetailStatus()!=-2){
-                        if(myJobDetail.getNextPlanDate()==null||myJobDetail.getNextPlanDate().getTime()-DateUtils.getNowDate().getTime()<0){
+                if(myJobDetail.getNextPlanDate()!=null&&myJobDetail.getJobDetailStatus()!=-2){
+                        if(myJobDetail.getNextPlanDate().getTime()-DateUtils.getNowDate().getTime()<0){
                                 int i = myJobMapper.updateStatus( myJobDetail.getJobDetailId());
                                 if(i>0){
                                         log.info("执行任务类型为：{}",myJobDetail.getTaskClass());
@@ -149,36 +147,20 @@ public class TgTaskConsumer{
                                 log.error("任务执行超时,任务详情为+{}",JSON.toJSONString(myJobDetail));
                         }
                 }else{
-                        String intervals = myJob.getIntervals();
-                        int intervalsUnit = myJob.getIntervalsUnit();
                         Date nowDate = DateUtils.getNowDate();
-                        if(intervalsUnit==1){
-                                //循环间隔为分钟
-                                Date nextPlanDate = DateUtils.addMinutes(nowDate, Integer.valueOf(intervals));
-                                myJobMapper.updateJobDetailStatus(nextPlanDate,myJobDetail.getJobId(),myJobDetail.getIndex());
-                        }else if(intervalsUnit==2){
-                                //循环间隔为小时
-                                Date nextPlanDate = DateUtils.addHours(nowDate, Integer.valueOf(intervals));
-                                myJobMapper.updateJobDetailStatus(nextPlanDate,myJobDetail.getJobId(),myJobDetail.getIndex());
-                        }else if (intervalsUnit==0){
-                                Date nextPlanDate = DateUtils.addSeconds(nowDate, Integer.valueOf(intervals));
-                                myJobMapper.updateJobDetailStatus(nextPlanDate,myJobDetail.getJobId(),myJobDetail.getIndex());
-
-                        }
-
+                        myJobMapper.updateJobDetailStatus(nowDate,myJobDetail.getJobId(),myJobDetail.getIndex());
                 }
         }
 
         public  void exec(String parms,MyJobDetail myJobDetail,MyJob myJob) throws IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException, NoSuchMethodException {
-
                         Class<?>runnable = Class.forName(myJobDetail.getTaskClass());
-                        Class[] parameterTypes={String.class,MyJobDetail.class, MyJobMapper.class,Boolean.class,MyJob.class};
+                        Class[] parameterTypes={String.class,MyJobDetail.class, MyJobMapper.class,Boolean.class,MyJob.class,TGUtil.class};
                         boolean flag = false;
                         if((myJobDetail.getIndex()+1) % myJob.getTarNum() == 0) {
                                 flag=true;
                         }
                         Constructor<?> constructors = runnable.getConstructor(parameterTypes);
-                        Object[] parameters={parms,myJobDetail,myJobMapper,flag,myJob};
+                        Object[] parameters={parms,myJobDetail,myJobMapper,flag,myJob,tgUtil};
                         Runnable o =(Runnable) constructors.newInstance(parameters);
                         executor.execute(o);
         };

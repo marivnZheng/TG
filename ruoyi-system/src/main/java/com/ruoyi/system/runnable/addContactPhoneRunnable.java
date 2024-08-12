@@ -31,19 +31,21 @@ public class addContactPhoneRunnable implements Runnable {
 
     private MyJob myJob;
 
-    public addContactPhoneRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob) {
+    private TGUtil tgUtil;
+
+    public addContactPhoneRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob,TGUtil tgUtil) {
         this.parms = parms;
         this.myJobDetail = myJobDetail;
         this.myJobMapper =myJobMapper;
         this.lastFlag=lastFlag;
         this.myJob=myJob;
+        this.tgUtil=tgUtil;
     }
     public addContactPhoneRunnable() {
 
     }
     @Override
     public void run() {
-        TGUtil tgUtil = new TGUtil();
         HashMap map = JSON.parseObject(parms,HashMap.class);
         map.put("userName", StringUtils.isEmpty(myJobDetail.getTarg())?myJobDetail.getTargId():myJobDetail.getTarg());
         try {
@@ -64,10 +66,12 @@ public class addContactPhoneRunnable implements Runnable {
                     log.error("该账号已经封禁");
                     myJob.setJobStatus("0");
                     myJobMapper.insertMyJob(myJob);
+                    myJobDetail.setMsg("该账号已经封禁");
+                }else{
+                    myJobDetail.setMsg((String) resultMap.get("msg"));
                 }
                 myJobDetail.setJobDetailDate(DateUtils.getNowDate());
                 myJobDetail.setJobDetailStatus(1);
-                myJobDetail.setMsg((String) resultMap.get("msg"));
                 if(lastFlag){
                     myJobMapper.updateMyJobAndStatusFail(myJobDetail.getJobId());
                 }else{

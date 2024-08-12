@@ -1,5 +1,7 @@
 package com.ruoyi;
 
+import com.ruoyi.system.util.TGUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -12,6 +14,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 public class RuoYiApplication
 {
+
     public static void main(String[] args)
     {
         // System.setProperty("spring.devtools.restart.enabled", "false");

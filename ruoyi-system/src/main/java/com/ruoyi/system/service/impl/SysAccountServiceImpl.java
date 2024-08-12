@@ -432,8 +432,8 @@ public class SysAccountServiceImpl implements ISysAccountService
                 sysAccount.setSysAccountFirstName((String)res.get("firstname"));
                 sysAccount.setSysAccountLastName((String)res.get("lastname"));
                 sysAccountMapper.insertSysAccount(sysAccount);
-            }else{
-                return error();
+            }else if(loginEntity.get("code").equals("304")){
+                return new AjaxResult(304,"文件已经失效");
             }
 
         }

@@ -6,6 +6,7 @@ import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -26,9 +27,15 @@ public class TGUtil {
     private String appHash = "a3406de8d171bb422bb6ddf3bbd800e2";
     private static final Pattern UNICODE_PATTERN = Pattern.compile("\\\\x([0-9a-fA-F]{2})");
 
+    @Value("${python.version}")
+    private String python;
+
     @Autowired
     private RedisCache redisCache;
 
+    public String getPythonVersion() {
+        return python;
+    }
 
     public String getFilePath(String methodName) {
         String pythonScriptPath = "ruoyi-system/src/main/python/";
@@ -63,13 +70,13 @@ public class TGUtil {
                 Thread.sleep(1000);
                 log.info("等待session 文件删除");
             }
-            cmd.add("python3");
+            cmd.add(python);
             cmd.add(getFilePath(methodName));
             cmd.add(appid);
             cmd.add(appHash);
             cmd.add((String) parms.get("phoneNumber"));
         } else if (StringUtils.equals(methodName, "loginByPhone")) {
-            cmd.add("python3");
+            cmd.add(python);
             cmd.add(getFilePath(methodName));
             cmd.add(appid);
             cmd.add(appHash);
@@ -79,7 +86,7 @@ public class TGUtil {
             String[] stringArray = cmd.toArray(new String[cmd.size()]);
             return  login(stringArray,parms.get("phoneNumber").toString());
         } else if (StringUtils.equals(methodName, "loginByPhoneAndPassword")) {
-            cmd.add("python3");
+            cmd.add(python);
             cmd.add(getFilePath(methodName));
             cmd.add(appid);
             cmd.add(appHash);
@@ -90,7 +97,7 @@ public class TGUtil {
             String[] stringArray = cmd.toArray(new String[cmd.size()]);
             return  login(stringArray,parms.get("phoneNumber").toString());
         } else if (StringUtils.equals(methodName, "sendMessage")) {
-            cmd.add("python3");
+            cmd.add(python);
             cmd.add(getFilePath(methodName));
             cmd.add(appid);
             cmd.add(appHash);
@@ -99,7 +106,7 @@ public class TGUtil {
             cmd.add((String) parms.get("message"));
             cmd.add(StringUtils.isEmpty((String) parms.get("filePath"))?"None":(String)parms.get("filePath"));
         }else if (StringUtils.equals(methodName, "forWordMessage")) {
-            cmd.add("python3");
+            cmd.add(python);
             cmd.add(getFilePath(methodName));
             cmd.add(appid);
             cmd.add(appHash);
@@ -108,7 +115,7 @@ public class TGUtil {
             cmd.add((String) parms.get("messageId"));
             cmd.add((String) parms.get("charId"));
         }else if(StringUtils.equals(methodName,"sendMessageChannel")){
-            cmd.add("python3");
+            cmd.add(python);
             cmd.add(getFilePath(methodName));
             cmd.add(appid);
             cmd.add(appHash);
@@ -117,7 +124,7 @@ public class TGUtil {
             cmd.add((String) parms.get("message"));
             cmd.add(StringUtils.isEmpty((String) parms.get("filePath"))?"None":(String) parms.get("filePath"));
         }else if(StringUtils.equals(methodName,"forWordMessageChannel")){
-            cmd.add("python3");
+            cmd.add(python);
             cmd.add(getFilePath(methodName));
             cmd.add(appid);
             cmd.add(appHash);
@@ -127,7 +134,7 @@ public class TGUtil {
             cmd.add((String) parms.get("charId"));
         }
         else if (StringUtils.equals(methodName, "loginBySessionFile")) {
-             cmd.add("python3");
+             cmd.add(python);
              cmd.add(getFilePath(methodName));
              cmd.add(appid);
              cmd.add(appHash);
@@ -135,40 +142,40 @@ public class TGUtil {
             String[] stringArray = cmd.toArray(new String[cmd.size()]);
              return  login(stringArray,parms.get("fileName").toString());
         } else if (StringUtils.equals(methodName, "addContact")) {
-             cmd.add("python3");
+             cmd.add(python);
              cmd.add(getFilePath(methodName));
              cmd.add(appid);
              cmd.add(appHash);
              cmd.add((String) parms.get("sessionPath"));
              cmd.add((String) parms.get("userName"));
         } else if (StringUtils.equals(methodName, "addContactTgPhone")) {
-             cmd.add("python3");
+             cmd.add(python);
              cmd.add(getFilePath(methodName));
              cmd.add(appid);
              cmd.add(appHash);
              cmd.add((String) parms.get("sessionPath"));
              cmd.add((String) parms.get("phone"));
         } else if (StringUtils.equals(methodName, "syncContact")) {
-             cmd.add("python3");
+             cmd.add(python);
              cmd.add(getFilePath(methodName));
              cmd.add(appid);
              cmd.add(appHash);
              cmd.add((String) parms.get("sysAccountStringSession"));
         } else if (StringUtils.equals(methodName, "syncGroup")) {
-             cmd.add("python3");
+             cmd.add(python);
              cmd.add(getFilePath(methodName));
              cmd.add(appid);
              cmd.add(appHash);
              cmd.add((String) parms.get("sysAccountStringSession"));
         } else if (StringUtils.equals(methodName, "getGroupMember")) {
-             cmd.add("python3");
+             cmd.add(python);
              cmd.add(getFilePath(methodName));
              cmd.add(appid);
              cmd.add(appHash);
              cmd.add((String) parms.get("sysAccountStringSession"));
              cmd.add(parms.get("sysGroupId").toString());
         } else if (StringUtils.equals(methodName, "InvoteGroup")) {
-             cmd.add("python3");
+             cmd.add(python);
              cmd.add(getFilePath(methodName));
              cmd.add(appid);
              cmd.add(appHash);
@@ -176,38 +183,38 @@ public class TGUtil {
              cmd.add((String) parms.get("channelId"));
              cmd.add((String) parms.get("sysContactUserName"));
         } else if (StringUtils.equals(methodName, "joinGroup")) {
-             cmd.add("python3");
+             cmd.add(python);
              cmd.add(getFilePath(methodName));
              cmd.add(appid);
              cmd.add(appHash);
              cmd.add((String) parms.get("sessionString"));
              cmd.add((String) parms.get("link"));
         } else if (StringUtils.equals(methodName, "syncAccount")) {
-             cmd.add("python3");
+             cmd.add(python);
              cmd.add(getFilePath(methodName));
              cmd.add(appid);
              cmd.add(appHash);
              cmd.add((String) parms.get("sessionString"));
         } else if (StringUtils.equals(methodName, "updateProFile")) {
-             cmd.add("python3");
+             cmd.add(python);
              cmd.add(getFilePath(methodName));
              cmd.add(appid);
              cmd.add(appHash);
-             cmd.add((String) parms.get("sessionString"));
-             cmd.add((String) parms.get("firstName"));
-             cmd.add((String) parms.get("lastName"));
-             cmd.add((String) parms.get("about"));
-             cmd.add((String) parms.get("userName"));
+             cmd.add(parms.get("sessionString")==null?"":(String) parms.get("sessionString"));
+             cmd.add(parms.get("firstName")==null?"":(String) parms.get("firstName"));
+             cmd.add(parms.get("lastName")==null?"":(String) parms.get("lastName"));
+             cmd.add(parms.get("about")==null?"":(String) parms.get("about"));
+             cmd.add(parms.get("userName")==null?"":(String) parms.get("userName"));
         }else if (StringUtils.equals(methodName, "updateUserName")) {
-             cmd.add("python3");
-             cmd.add(getFilePath(methodName));
-             cmd.add(appid);
-             cmd.add(appHash);
-             cmd.add((String) parms.get("sessionString"));
-             cmd.add((String) parms.get("firstName"));
-             cmd.add((String) parms.get("lastName"));
-             cmd.add((String) parms.get("about"));
-             cmd.add((String) parms.get("userName"));
+            cmd.add(python);
+            cmd.add(getFilePath(methodName));
+            cmd.add(appid);
+            cmd.add(appHash);
+            cmd.add(parms.get("sessionString")==null?"":(String) parms.get("sessionString"));
+            cmd.add(parms.get("firstName")==null?"":(String) parms.get("firstName"));
+            cmd.add(parms.get("lastName")==null?"":(String) parms.get("lastName"));
+            cmd.add(parms.get("about")==null?"":(String) parms.get("about"));
+            cmd.add(parms.get("userName")==null?"":(String) parms.get("userName"));
         }
         String[] stringArray = cmd.toArray(new String[cmd.size()]);
         return execCmd(stringArray);
