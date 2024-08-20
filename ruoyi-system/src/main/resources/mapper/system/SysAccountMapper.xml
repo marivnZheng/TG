@@ -52,7 +52,7 @@
         </where>
     </select>
 
-    <select id="selectCountUserId">
+    <select id="selectCountUserId" >
         select count(1) from  sys_account
         <where>
             <if test="sysUserId!=null"> and sys_user_id = #{sysUserId}</if>

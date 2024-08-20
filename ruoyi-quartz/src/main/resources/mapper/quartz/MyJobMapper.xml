@@ -160,9 +160,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</insert>
 
 	<insert id="batchMyJobDetail">
-		insert into my_job_detail( my_job_detail_status,my_job_id,my_job_detail_targ,my_job_detail_task_class,my_job_detail_index,my_job_detail_targ_id) values
+		insert into my_job_detail( my_job_detail_status,my_job_id,my_job_detail_targ,my_job_detail_task_class,my_job_detail_index,my_job_detail_targ_id,my_job_detail_next_plan_date) values
 		<foreach item="item" index="index" collection="list" separator=",">
-			(#{item.jobDetailStatus},#{item.jobId},#{item.targ},#{item.taskClass},#{item.index},#{item.targId})
+			(#{item.jobDetailStatus},#{item.jobId},#{item.targ},#{item.taskClass},#{item.index},#{item.targId},#{item.nextPlanDate})
 		</foreach>
 	</insert>
 

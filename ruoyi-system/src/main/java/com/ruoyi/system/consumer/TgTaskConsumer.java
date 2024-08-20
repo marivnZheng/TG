@@ -49,79 +49,84 @@ public class TgTaskConsumer{
                 List<MyJob> myJobs = sysTaskMapper.selectTaskListByStatus();
                 for (MyJob myJob : myJobs) {
                         //循环任务
-                        if(myJob.getJobType().equals("2")){
-                                //验证任务是否已经运行完毕
-                                String parms = myJob.getParms();
-                                MyJobDetail myJobDetail = sysTaskMapper.selectSysTaskDetailListOrderByIndex(myJob.getJobId());
-                                if(myJobDetail==null){
-                                        //任务执行完毕，判断是否循环
-                                        Map map = JSON.parseObject(parms, Map.class);
-                                        String startTime = (String) map.get("startTime");
-                                        String endTime = (String) map.get("endTime");
-                                        String endDate = (String) map.get("endDate");
-                                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                                        //存在结束时间
-                                        log.info("startTime:{},endTime:{},endDate:{},nowDate:{}",startTime,endTime,endDate,DateUtils.getNowDate().getTime());
-                                        if(!StringUtils.isEmpty(endDate)){
-                                                if(dateFormat.parse(endDate).getTime()-DateUtils.getNowDate().getTime()<0){
-                                                        //设置不在循环
-                                                        myJob.setLoopEnd(1);
-                                                        myJob.setJobStatus("3");
+                        try {
+                                if(myJob.getJobType().equals("2")){
+                                        //验证任务是否已经运行完毕
+                                        String parms = myJob.getParms();
+                                        MyJobDetail myJobDetail = sysTaskMapper.selectSysTaskDetailListOrderByIndex(myJob.getJobId());
+                                        if(myJobDetail==null){
+                                                //任务执行完毕，判断是否循环
+                                                Map map = JSON.parseObject(parms, Map.class);
+                                                String startTime = (String) map.get("startTime");
+                                                String endTime = (String) map.get("endTime");
+                                                String endDate = (String) map.get("endDate");
+                                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                                                //存在结束时间
+                                                log.info("startTime:{},endTime:{},endDate:{},nowDate:{}",startTime,endTime,endDate,DateUtils.getNowDate().getTime());
+                                                if(!StringUtils.isEmpty(endDate)){
+                                                        if(dateFormat.parse(endDate).getTime()-DateUtils.getNowDate().getTime()<0){
+                                                                //设置不在循环
+                                                                myJob.setLoopEnd(1);
+                                                                myJob.setJobStatus("3");
+                                                                myJobMapper.insertMyJob(myJob);
+                                                                break;
+                                                        }
+                                                }
+                                                //存在休息时间段
+                                                if(!StringUtils.isEmpty(startTime)&&!StringUtils.isEmpty(endTime)){
+                                                        Date startTime1 = dateFormat.parse(startTime);
+                                                        Date endTime1= dateFormat.parse(endTime);
+                                                        //区间内不执行
+                                                        if(isEffectiveDate(DateUtils.getNowDate(),startTime1,endTime1) ){
+                                                                break;
+                                                        }
+                                                }
+                                                //比对计划是否到达计划时间，是则创建任务
+                                                if(myJob.getPlanDate()!=null && myJob.getPlanDate().getTime()-DateUtils.getNowDate().getTime()<0){
+                                                        //大于计划时间，设置任务
+                                                        myJob.setJobStatus("1");
+                                                        myJob.setSuccessNum(0);
                                                         myJobMapper.insertMyJob(myJob);
-                                                        break;
+                                                        List<MyJobDetail> myJobDetails = sysTaskMapper.selectSysTaskDetailList(myJob.getJobId());
+                                                        sysTaskMapper.deleteByJobId(myJob.getJobId());
+                                                        for (MyJobDetail jobDetail : myJobDetails) {
+                                                                jobDetail.setJobDetailStatus(-1);
+                                                        }
+                                                        List<List<MyJobDetail>> partition = ListUtil.partition(myJobDetails, 100);
+                                                        partition.forEach(list -> myJobMapper.batchMyJobDetail(list));
                                                 }
-                                        }
-                                        //存在休息时间段
-                                        if(!StringUtils.isEmpty(startTime)&&!StringUtils.isEmpty(endTime)){
-                                                Date startTime1 = dateFormat.parse(startTime);
-                                                Date endTime1= dateFormat.parse(endTime);
-                                                //区间内不执行
-                                                if(isEffectiveDate(DateUtils.getNowDate(),startTime1,endTime1) ){
-                                                        break;
+                                        }else{
+                                                log.info("执行任务详情：{}",JSON.toJSONString(myJobDetail));
+                                                //判断是否到达执行时间
+                                                if(myJobDetail.getNextPlanDate()!=null){
+                                                        if(myJobDetail.getNextPlanDate().getTime()-DateUtils.getNowDate().getTime()<0){
+                                                                setNextPlanDate(myJobDetail,myJob);
+                                                        }
+                                                }else{
+                                                        setNextPlanDate(myJobDetail,myJob);
                                                 }
-                                        }
-                                        //比对计划是否到达计划时间，是则创建任务
-                                        if(myJob.getPlanDate()!=null && myJob.getPlanDate().getTime()-DateUtils.getNowDate().getTime()<0){
-                                                //大于计划时间，设置任务
-                                                myJob.setJobStatus("1");
-                                                myJob.setSuccessNum(0);
-                                                myJobMapper.insertMyJob(myJob);
-                                                List<MyJobDetail> myJobDetails = sysTaskMapper.selectSysTaskDetailList(myJob.getJobId());
-                                                sysTaskMapper.deleteByJobId(myJob.getJobId());
-                                                for (MyJobDetail jobDetail : myJobDetails) {
-                                                        jobDetail.setJobDetailStatus(-1);
-                                                }
-                                                List<List<MyJobDetail>> partition = ListUtil.partition(myJobDetails, 100);
-                                                partition.forEach(list -> myJobMapper.batchMyJobDetail(list));
                                         }
                                 }else{
+                                        MyJobDetail myJobDetail = sysTaskMapper.selectSysTaskDetailListOrderByIndex(myJob.getJobId());
                                         log.info("执行任务详情：{}",JSON.toJSONString(myJobDetail));
-                                        //判断是否到达执行时间
-                                        if(myJobDetail.getNextPlanDate()!=null){
-                                                if(myJobDetail.getNextPlanDate().getTime()-DateUtils.getNowDate().getTime()<0){
+                                        if(myJobDetail!=null){
+                                                //判断是否到达执行时间
+                                                if(myJobDetail.getNextPlanDate()!=null){
+                                                        if(myJobDetail.getNextPlanDate().getTime()-DateUtils.getNowDate().getTime()<0||myJobDetail.getNextPlanDate()==null){
+                                                                setNextPlanDate(myJobDetail,myJob);
+                                                        }
+                                                }else{
                                                         setNextPlanDate(myJobDetail,myJob);
                                                 }
                                         }else{
-                                                setNextPlanDate(myJobDetail,myJob);
+                                                myJob.setJobStatus("3");
+                                                myJobMapper.insertMyJob(myJob);
                                         }
                                 }
-                        }else{
-                                MyJobDetail myJobDetail = sysTaskMapper.selectSysTaskDetailListOrderByIndex(myJob.getJobId());
-                                log.info("执行任务详情：{}",JSON.toJSONString(myJobDetail));
-                                if(myJobDetail!=null){
-                                        //判断是否到达执行时间
-                                        if(myJobDetail.getNextPlanDate()!=null){
-                                                if(myJobDetail.getNextPlanDate().getTime()-DateUtils.getNowDate().getTime()<0||myJobDetail.getNextPlanDate()==null){
-                                                        setNextPlanDate(myJobDetail,myJob);
-                                                }
-                                        }else{
-                                                setNextPlanDate(myJobDetail,myJob);
-                                        }
-                                }else{
-                                        myJob.setJobStatus("3");
-                                        myJobMapper.insertMyJob(myJob);
-                                }
+                        }catch (Exception e){
+                                log.error("任务执行失败，任务id:{},失败原因:{}",myJob.getJobId(),e.getMessage());
                         }
+
                 }
         }
 

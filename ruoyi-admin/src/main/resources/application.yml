@@ -69,7 +69,7 @@ spring:
   redis:
     # 地址
 
-    host: 154.92.16.84
+    host: localhost
     # 端口，默认为6379
     port: 6379
     # 数据库索引
@@ -114,7 +114,7 @@ pagehelper:
   params: count=countSql
 
 python:
-  version: python3
+  version: python
 # Swagger配置
 swagger:
   # 是否开启swagger

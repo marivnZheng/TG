@@ -28,10 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.ruoyi.common.core.domain.AjaxResult.error;
 import static com.ruoyi.common.core.domain.AjaxResult.success;
@@ -309,6 +306,7 @@ public class SysTaskServiceImpl implements ISysTaskService
         String shareType = map.get("shareType").toString();
         String onceType = map.get("onceType").toString();
         String onceMin = map.get("onceMin").toString();
+        String nextPlanDate =String.valueOf(map.get("nextPlanDate"));
         List<Map> accountList = (List<Map>) map.get("accountList");
         //分配方式 全部
         String[] split = targetString.split("\\\n");
@@ -332,7 +330,9 @@ public class SysTaskServiceImpl implements ISysTaskService
                 parms.put("endTime",map.get("endTime"));
                 parms.put("isVip",accountDetailId>1?true:false);
                 parms.put("startTime",map.get("startTime"));
+                parms.put("forWordMessage",map.get("forWordMessage"));
                 parms.put("endDate",map.get("endDate"));
+                parms.put("nextPlanDate",map.get("nextPlanDate"));
                 MyJob myJob = new MyJob();
                 myJob.setIntervals(onceMin+"");
                 myJob.setIntervalsUnit(Integer.valueOf(onceType));
@@ -356,6 +356,10 @@ public class SysTaskServiceImpl implements ISysTaskService
                     jobDetail.setJobId(myJob.getJobId());
                     jobDetail.setTaskClass("com.ruoyi.system.runnable.sendMessageContactRunnable");
                     jobDetail.setJobDetailStatus(-1);
+                    if(!StringUtils.equals(nextPlanDate,"null")){
+                        long date = Long.valueOf(nextPlanDate);
+                        jobDetail.setNextPlanDate(new Date(date));
+                    }
                     listJobDetail.add(jobDetail);
                     index++;
                 }
@@ -393,8 +397,10 @@ public class SysTaskServiceImpl implements ISysTaskService
                 parms.put("sendIndex",0);
                 parms.put("endTime",map.get("endTime"));
                 parms.put("isVip",accountDetailId>1?true:false);
+                parms.put("forWordMessage",map.get("forWordMessage"));
                 parms.put("startTime",map.get("startTime"));
                 parms.put("endDate",map.get("endDate"));
+                parms.put("nextPlanDate",map.get("nextPlanDate"));
                 job.setTarNum(accountLinkList.size());
                 job.setJobType("1");
                 job.setJobName("发送信息给用户");
@@ -418,6 +424,10 @@ public class SysTaskServiceImpl implements ISysTaskService
                     jobDetail.setJobId(job.getJobId());
                     jobDetail.setTaskClass("com.ruoyi.system.runnable.sendMessageContactRunnable");
                     jobDetail.setJobDetailStatus(-1);
+                    if(!StringUtils.equals(nextPlanDate,"null")){
+                        long date = Long.valueOf(nextPlanDate);
+                        jobDetail.setNextPlanDate(new Date(date));
+                    }
                     listDetail.add(jobDetail);
                     index++;
                 }
@@ -463,7 +473,7 @@ public class SysTaskServiceImpl implements ISysTaskService
             }
             }
         }catch (Exception e){
-            return new AjaxResult(400,e.getMessage());
+            return new AjaxResult(488,e.getMessage());
         }
 
         return success();
@@ -476,7 +486,7 @@ public class SysTaskServiceImpl implements ISysTaskService
             sysTaskMapper.BatchDeleteJobDetailByJobId(myJob);
             return success();
         }catch (Exception e){
-            return new AjaxResult(400,e.getMessage());
+            return new AjaxResult(488,e.getMessage());
         }
     }
 }

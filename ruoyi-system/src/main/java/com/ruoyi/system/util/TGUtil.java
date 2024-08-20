@@ -5,6 +5,7 @@ import cn.hutool.json.JSONObject;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.python.antlr.ast.Str;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -200,21 +201,22 @@ public class TGUtil {
              cmd.add(getFilePath(methodName));
              cmd.add(appid);
              cmd.add(appHash);
-             cmd.add(parms.get("sessionString")==null?"":(String) parms.get("sessionString"));
-             cmd.add(parms.get("firstName")==null?"":(String) parms.get("firstName"));
-             cmd.add(parms.get("lastName")==null?"":(String) parms.get("lastName"));
-             cmd.add(parms.get("about")==null?"":(String) parms.get("about"));
-             cmd.add(parms.get("userName")==null?"":(String) parms.get("userName"));
+             cmd.add((String) parms.get("sessionString"));
+             cmd.add(StringUtils.isEmpty((String) parms.get("firstName")) ?"none":(String) parms.get("firstName"));
+            cmd.add(StringUtils.isEmpty((String) parms.get("lastName")) ?"none":(String) parms.get("lastName"));
+            cmd.add(StringUtils.isEmpty((String) parms.get("about")) ?"none":(String) parms.get("about"));
+            cmd.add(StringUtils.isEmpty((String) parms.get("userName")) ?"none":(String) parms.get("userName"));
+
         }else if (StringUtils.equals(methodName, "updateUserName")) {
             cmd.add(python);
             cmd.add(getFilePath(methodName));
             cmd.add(appid);
             cmd.add(appHash);
-            cmd.add(parms.get("sessionString")==null?"":(String) parms.get("sessionString"));
-            cmd.add(parms.get("firstName")==null?"":(String) parms.get("firstName"));
-            cmd.add(parms.get("lastName")==null?"":(String) parms.get("lastName"));
-            cmd.add(parms.get("about")==null?"":(String) parms.get("about"));
-            cmd.add(parms.get("userName")==null?"":(String) parms.get("userName"));
+            cmd.add(parms.get("sessionString")==""?"none":(String) parms.get("sessionString"));
+            cmd.add(StringUtils.isEmpty((String) parms.get("firstName")) ?"none":(String) parms.get("firstName"));
+            cmd.add(StringUtils.isEmpty((String) parms.get("lastName")) ?"none":(String) parms.get("lastName"));
+            cmd.add(StringUtils.isEmpty((String) parms.get("about")) ?"none":(String) parms.get("about"));
+            cmd.add(StringUtils.isEmpty((String) parms.get("userName")) ?"none":(String) parms.get("userName"));
         }
         String[] stringArray = cmd.toArray(new String[cmd.size()]);
         return execCmd(stringArray);

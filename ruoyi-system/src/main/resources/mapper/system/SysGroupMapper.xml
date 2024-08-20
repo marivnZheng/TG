@@ -46,6 +46,13 @@
         where sys_account_string_session = #{StringSession}
     </select>
 
+    <insert id="batchSysGroup">
+        insert into sys_group( sys_group_id,sys_user_id,sys_group_title,sys_group_link,sys_group_detail,sys_group_send_photo
+        ,sys_group_send_message,sys_group_invite,sys_account_string_session,sys_account_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.sysGroupId},#{item.sysUserId},#{item.sysGroupTitle},#{item.sysGroupLink},#{item.sysGroupDetail},#{item.sysGroupSendPhoto},#{item.sysGroupSendMessage},#{item.sysGroupInvite},#{item.sysAccountStringSession},#{item.sysAccountId})
+        </foreach>
+    </insert>
 
     <insert id="insertSysGroup" parameterType="SysGroup">
         insert into sys_group

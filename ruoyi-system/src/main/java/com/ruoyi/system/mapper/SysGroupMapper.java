@@ -39,6 +39,9 @@ public interface SysGroupMapper
      */
     public int insertSysGroup(SysGroup sysGroup);
 
+
+    public int batchSysGroup(List<SysGroup> list);
+
     /**
      * 修改
      * 

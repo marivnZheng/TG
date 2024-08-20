@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -31,10 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.lang.reflect.Parameter;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -171,9 +169,10 @@ public class SysAccountServiceImpl implements ISysAccountService
                     HashMap parms = new HashMap();
                     parms.put("sysAccountStringSession",sysAccountStringSession);
                     try {
-                        log.info("当前账号为：{}，账号为：{}，开始同步好友。",user.getUserName(),sysAccountId);
+                        log.info("当前账号为：{}，账号为：{}，开始同步群组。",user.getUserName(),sysAccountId);
                         sysGroupMapper.deleteSysContactByAccountId(sysAccountId);
                         String syncGroup = tgUtil.GenerateCommand("syncGroup", parms);
+                        ArrayList groupList = new ArrayList();
                         for (String s : syncGroup.split("\n")) {
                             String substring = s.substring(s.indexOf("{"), s.indexOf("}")+1);
                             Map map = JSON.parseObject(tgUtil.decodeJson(substring), Map.class);
@@ -188,8 +187,10 @@ public class SysAccountServiceImpl implements ISysAccountService
                             group.setSysUserId(user.getUserId());
                             group.setSysAccountStringSession(sysAccountStringSession);
                             group.setSysAccountId(sysAccountId);
-                            sysGroupMapper.insertSysGroup(group);
+                            groupList.add(group);
                         }
+                        List<List<SysGroup>> partition = ListUtil.partition(groupList, 100);
+                        partition.forEach(item -> sysGroupMapper.batchSysGroup(item));
                     } catch (InterruptedException | IOException ex) {
                         ex.printStackTrace();
                     }
@@ -209,6 +210,7 @@ public class SysAccountServiceImpl implements ISysAccountService
                  sysContactMapper.deleteSysContactByAccountId(sysAccountId);
                  try {
                      String syncContact = tgUtil.GenerateCommand("syncContact", parms);
+                     ArrayList contactList = new ArrayList();
                      for (String s : syncContact.split("\n")) {
                          String substring = s.substring(s.indexOf("{"), s.indexOf("}") + 1);
                          Map map = JSON.parseObject(tgUtil.decodeJson(substring).replace("\\\\\"", "\\\""), Map.class);
@@ -224,8 +226,10 @@ public class SysAccountServiceImpl implements ISysAccountService
                          sysContact.setSysContactPhone((String) map.get("contactNumberr"));
                          sysContact.setSysContactId(Long.parseLong((String) map.get("contactId")));
                          sysContact.setSysAccountId(sysAccountId);
-                         sysContactMapper.insertSysContact(sysContact);
+                         contactList.add(sysContact);
                      }
+                     List<List<SysContact>> partition = ListUtil.partition(contactList, 100);
+                     partition.forEach(item -> sysContactMapper.batchInsertSysContact(item));
                  } catch (InterruptedException | IOException ex) {
                      ex.printStackTrace();
                  }

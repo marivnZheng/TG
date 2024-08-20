@@ -131,9 +131,10 @@ public class SysGroupServiceImpl implements ISysGroupService
                     HashMap parms = new HashMap();
                     parms.put("sysAccountStringSession",sysAccountStringSession);
                     try {
-                        log.info("当前账号为：{}，账号为：{}，开始同步好友。",getLoginUser().getUsername(),sysAccountId);
+                        log.info("当前账号为：{}，账号为：{}，开始同步群组。",getLoginUser().getUsername(),sysAccountId);
                         sysGroupMapper.deleteSysContactByAccountId(sysAccountId);
                         String syncGroup = tgUtil.GenerateCommand("syncGroup", parms);
+                        ArrayList groupList = new ArrayList();
                         for (String s : syncGroup.split("\n")) {
                             String substring = s.substring(s.indexOf("{"), s.indexOf("}")+1);
                             Map map = JSON.parseObject(tgUtil.decodeJson(substring), Map.class);
@@ -148,8 +149,10 @@ public class SysGroupServiceImpl implements ISysGroupService
                             group.setSysUserId(getLoginUser().getUserId());
                             group.setSysAccountStringSession(sysAccountStringSession);
                             group.setSysAccountId(sysAccountId);
-                            sysGroupMapper.insertSysGroup(group);
+                            groupList.add(group);
                         }
+                        List<List<SysGroup>> partition = ListUtil.partition(groupList, 100);
+                        partition.forEach(item -> sysGroupMapper.batchSysGroup(item));
                     } catch (InterruptedException | IOException ex) {
                         ex.printStackTrace();
                     }

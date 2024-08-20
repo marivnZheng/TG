@@ -66,6 +66,7 @@ public class SysContactServiceImpl implements ISysContactService {
                     sysContactMapper.deleteSysContactByAccountId(e.getSysAccountId());
                     try {
                         String syncContact = tgUtil.GenerateCommand("syncContact", parms);
+                        ArrayList contactList = new ArrayList();
                         for (String s : syncContact.split("\n")) {
                             String substring = s.substring(s.indexOf("{"), s.indexOf("}") + 1);
                             Map map = JSON.parseObject(tgUtil.decodeJson(substring).replace("\\\\\"", "\\\""), Map.class);
@@ -81,8 +82,10 @@ public class SysContactServiceImpl implements ISysContactService {
                             sysContact.setSysContactPhone((String) map.get("contactNumberr"));
                             sysContact.setSysContactId(Long.parseLong((String) map.get("contactId")));
                             sysContact.setSysAccountId(e.getSysAccountId());
-                            sysContactMapper.insertSysContact(sysContact);
+                            contactList.add(sysContact);
                         }
+                        List<List<SysContact>> partition = ListUtil.partition(contactList, 100);
+                        partition.forEach(item -> sysContactMapper.batchInsertSysContact(item));
                     } catch (InterruptedException | IOException ex) {
                         ex.printStackTrace();
                     }

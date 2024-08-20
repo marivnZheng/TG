@@ -42,6 +42,14 @@
         where sys_account_id = #{accountId}
     </select>
 
+    <insert id="batchInsertSysContact">
+        insert into sys_contact( sys_contact_id,sys_account_id,sys_user_id,sys_contact_name,sys_contact_user_name,sys_mutual_contact
+        ,sys_status,sys_contact_phone) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.sysContactId},#{item.sysAccountId},#{item.sysUserId},#{item.sysContactName},#{item.sysContactUserName},#{item.sysMutualContact},#{item.sysStatus},#{item.sysContactPhone})
+        </foreach>
+    </insert>
+
     <update  id="insertSysContact" parameterType="SysContact">
         insert into sys_contact
         <trim prefix="(" suffix=")" suffixOverrides=",">

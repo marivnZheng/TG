@@ -24,6 +24,14 @@ userName = sys.argv[7]
 json._default_encoder=JSONEncoder(ensure_ascii=False)
 client = TelegramClient(StringSession(sessionPath), api_id, api_hash,system_version="4.16.30-vxCUSTOM",proxy=(socks.SOCKS5, 'localhost', 4444))
 client.connect()
+if firstName =='none':
+    firstName=''
+if lastName =='none':
+    lastName=''
+if about =='none':
+    about=''
+if userName =='none':
+    userName=''
 try:
     client(UpdateUsernameRequest(userName))
     print("{" + '"code":"{}","msg":"{}"'.format(200, "成功修改") + "}")
