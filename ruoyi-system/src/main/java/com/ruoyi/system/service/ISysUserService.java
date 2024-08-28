@@ -1,6 +1,9 @@
 package com.ruoyi.system.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import com.ruoyi.common.core.domain.entity.SysUser;
 
 /**
@@ -17,6 +20,9 @@ public interface ISysUserService
      * @return 用户信息集合信息
      */
     public List<SysUser> selectUserList(SysUser user);
+
+
+    public HashMap getNumber();
 
     /**
      * 根据条件分页查询已分配用户角色列表

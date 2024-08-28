@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.system;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
@@ -63,6 +64,15 @@ public class SysUserController extends BaseController
         startPage();
         List<SysUser> list = userService.selectUserList(user);
         return getDataTable(list);
+    }
+
+
+    @PreAuthorize("@ss.hasPermi('system:user:list')")
+    @GetMapping("/getNumber")
+    public HashMap getNumber()
+    {
+
+        return userService.getNumber();
     }
 
     @Log(title = "用户管理", businessType = BusinessType.EXPORT)

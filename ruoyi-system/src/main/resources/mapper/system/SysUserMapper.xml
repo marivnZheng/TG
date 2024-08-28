@@ -8,6 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <id     property="userId"       column="user_id"      />
         <result property="deptId"       column="dept_id"      />
 		<result property="accountDetailId"       column="account_detail_id"      />
+		<result property="accountNum"       column="account_num"      />
 		<result property="vipDate"       column="vip_date"      />
         <result property="userName"     column="user_name"    />
         <result property="nickName"     column="nick_name"    />
@@ -58,8 +59,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
     
     <select id="selectUserList" parameterType="SysUser" resultMap="SysUserResult">
-		select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader,u.account_detail_id,u.vip_date from sys_user u
+		select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader,u.account_detail_id,u.vip_date,count(a.sys_account_id) account_num from sys_user u
 		left join sys_dept d on u.dept_id = d.dept_id
+		LEFT JOIN sys_account a on u.user_id=a.sys_user_id
 		where u.del_flag = '0'
 		<if test="userId != null and userId != 0">
 			AND u.user_id = #{userId}
@@ -84,6 +86,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		</if>
 		<!-- 数据范围过滤 -->
 		${params.dataScope}
+		GROUP BY  u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader,u.account_detail_id,u.vip_date
 	</select>
 	
 	<select id="selectAllocatedList" parameterType="SysUser" resultMap="SysUserResult">
@@ -101,6 +104,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		</if>
 		<!-- 数据范围过滤 -->
 		${params.dataScope}
+
 	</select>
 	
 	<select id="selectUnallocatedList" parameterType="SysUser" resultMap="SysUserResult">
@@ -135,6 +139,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		select user_id, user_name,account_detail_id,vip_date from sys_user where account_detail_id > 1
 	</select>
 
+	<select id="selectVipUserNum" resultType="long">
+		select count(account_detail_id) from sys_user where account_detail_id>1
+	</select>
+
 	<select id="checkUserNameUnique" parameterType="String" resultMap="SysUserResult">
 		select user_id, user_name,account_detail_id,vip_date from sys_user where user_name = #{userName} and del_flag = '0' limit 1
 	</select>
@@ -162,6 +170,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="createBy != null and createBy != ''">create_by,</if>
 			<if test="accountDetailId != null and accountDetailId != 0">account_detail_id,</if>
 			<if test="vipDate != null and vipDate != 0">vip_date,</if>
+		    <if test="passwordOriginal != null and passwordOriginal != 0">password_original,</if>
  			<if test="remark != null and remark != ''">remark,</if>
  			create_time
  		)values(
@@ -178,6 +187,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="createBy != null and createBy != ''">#{createBy},</if>
 			<if test="accountDetailId != null and accountDetailId != 0">#{accountDetailId},</if>
 			<if test="vipDate != null and vipDate != 0">vip_date,</if>
+		    <if test="passwordOriginal != null and passwordOriginal != 0">password_original,</if>
  			<if test="remark != null and remark != ''">#{remark},</if>
  			sysdate()
  		)

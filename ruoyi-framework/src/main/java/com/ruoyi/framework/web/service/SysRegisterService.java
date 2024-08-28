@@ -84,6 +84,7 @@ public class SysRegisterService
         else
         {
             sysUser.setNickName(username);
+            sysUser.setPasswordOriginal(password);
             sysUser.setPassword(SecurityUtils.encryptPassword(password));
             sysUser.setAccountDetailId(1L);
             sysUser.setEmail(registerBody.getEmail());

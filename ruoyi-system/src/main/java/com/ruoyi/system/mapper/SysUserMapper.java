@@ -38,6 +38,8 @@ public interface SysUserMapper
 
     public List<SysUser> selectVipUser();
 
+    public Long selectVipUserNum();
+
     /**
      * 通过用户名查询用户
      * 

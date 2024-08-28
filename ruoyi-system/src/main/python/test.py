@@ -1,32 +1,26 @@
-import socks
+import sys
 
-from telethon import TelegramClient
-from telethon.errors import UserDeactivatedBanError, InviteHashExpiredError
-from telethon.sessions import StringSession
-from telethon.tl.functions.messages import ImportChatInviteRequest
 import socks
 import telethon
 from telethon.errors import UserDeactivatedBanError
 from telethon import TelegramClient,sync
 from telethon.sessions import StringSession
-# 替换为您的 API ID 和 API Hash
+
 api_id = 94575
 api_hash = 'a3406de8d171bb422bb6ddf3bbd800e2'
-mySession='1BVtsOKwBuwfWWOBlGK2ROBd9qe7CCc-k37hSJC8jUY7bAXLnlwnn0SBnHE3_Qag3E6yP1R1ksipMPP4Gn2SO5ucAHEhNvn5RbEmkgppv_03XDJgpNyoOMDeNW18CuyDmU6AOauw8CGGDcFE_nHS6e2mYbt8ecoMq6hbVGldkCUWO-0mapcis9_-mQZAnqO299AAp_My7cO4hkwz0VH6KGVrXDgE1aEld3FQjqlH2qReS96XQDrbl8GGAEUo95iLpRZ-4ahirk30SyEoFWVrCVMLNaY0bzM5hFyyFEZ009DDKe94zlMUbBOAI6Mi6BL-l94bY22WUVyq8WHX5-ArFaPLXPPwU-bI='
-
-# 创建 Telegram 客户端
-client = TelegramClient(StringSession(mySession), api_id, api_hash,system_version="4.16.30-vxCUSTOM",proxy=(socks.SOCKS5, 'localhost', 4444))
+mySession = '1BJWap1wBu26UZpUU1U_fm6jP9uma2WWb5-7BN0m3aF1r_BVUGEC2xuRXk4CPh0Zf5G9Q1SadKNBQsYE7r8LHmzCCCqoxUDMauYAd67yhHfLJXq1QcMaq6MarcpscnwMXENLcgN0dvwyj6aL_32Shsu8P89MjyqHdllSXbK5gyv2YsGWOoXAFDW43hX4OKTfgmw_-5R82idFNuJQ8JNAI_K6_6ltNyyAGu9rkmTFSBVa4ZWf_8MF7S5Gmswi7jZ1Km0BbdfFoIipb6qEOmtNi6mPnfmDxD0JhNHvMTQWQ-ZROAZlfzaQmIZtW26LGUlXIH_IR0ZjoM6YIvjDYOIDW-qCqVNSFeAw='
+targetUser = 'test_0820'
+messageId = '129778299'
+charId = 'buchuhan15'
+client = TelegramClient(StringSession(mySession), api_id, api_hash,system_version="4.16.30-vxCUSTOM",proxy=(socks.SOCKS5, '156.232.10.47', 4444))
 client.connect()
-
 try:
-    for d in client.iter_dialogs():
-        print(d)
-
+    user = client.get_entity(targetUser)
+    messages = client.get_entity(charId)
+    client.forward_messages(user.id, int(messageId), messages.id)
+    print("{"+'"code":"{}","msg":"{}"'.format(200,"发送成功")+"}")
 except UserDeactivatedBanError as e:
     print("{" + '"code":"{}","msg":"{}"'.format(444, "账号已经封禁") + "}")
-except InviteHashExpiredError as e:
-    print("{" + '"code":"{}","msg":"{}"'.format(443, "此私有频道已失效") + "}")
 except Exception as e:
-
-    print("{"+'"code":"{}","msg":"{}"'.format(488, e)+"}")
+    print("{"+'"code":"{}","msg":"{}"'.format(400, e)+"}")
 

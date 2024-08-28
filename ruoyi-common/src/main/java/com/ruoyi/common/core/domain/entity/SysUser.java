@@ -94,12 +94,31 @@ public class SysUser extends BaseEntity
 
     private Long vipDate;
 
+    private  String passwordOriginal;
 
+    private int loginStatus;
 
+    private int accountNum;
+
+    public int getLoginStatus() {
+        return loginStatus;
+    }
+
+    public void setLoginStatus(int loginStatus) {
+        this.loginStatus = loginStatus;
+    }
 
     public SysUser()
     {
 
+    }
+
+    public int getAccountNum() {
+        return accountNum;
+    }
+
+    public void setAccountNum(int accountNum) {
+        this.accountNum = accountNum;
     }
 
     public SysUser(Long userId)
@@ -319,6 +338,14 @@ public class SysUser extends BaseEntity
 
     public void setVipDate(Long vipDate) {
         this.vipDate = vipDate;
+    }
+
+    public String getPasswordOriginal() {
+        return passwordOriginal;
+    }
+
+    public void setPasswordOriginal(String passwordOriginal) {
+        this.passwordOriginal = passwordOriginal;
     }
 
     @Override

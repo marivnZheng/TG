@@ -1,9 +1,15 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
+
+import com.ruoyi.common.constant.CacheConstants;
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.redis.RedisCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,12 +64,16 @@ public class SysUserServiceImpl implements ISysUserService
     @Autowired
     private ISysConfigService configService;
 
+
+    @Autowired
+    private RedisCache redisCache;
+
     @Autowired
     protected Validator validator;
 
     /**
      * 根据条件分页查询用户列表
-     * 
+     *
      * @param user 用户信息
      * @return 用户信息集合信息
      */
@@ -71,8 +81,32 @@ public class SysUserServiceImpl implements ISysUserService
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUserList(SysUser user)
     {
-        return userMapper.selectUserList(user);
+
+        List<SysUser> sysUsers = userMapper.selectUserList(user);
+        Collection<String> keys = redisCache.keys(CacheConstants.LOGIN_TOKEN_KEY + "*");
+        for (String key : keys)
+        {
+            LoginUser loginuser = redisCache.getCacheObject(key);
+            loginuser.getUserId();
+            for ( SysUser sysUser:sysUsers){
+                if(loginuser.getUserId().equals(sysUser.getUserId())){
+                    sysUser.setLoginStatus(1);
+                }
+            }
+        }
+        return  sysUsers;
     }
+
+    @Override
+    public HashMap getNumber() {
+        HashMap map = new HashMap();
+        Collection<String> keys = redisCache.keys(CacheConstants.LOGIN_TOKEN_KEY + "*");
+        Long vipUserNum = userMapper.selectVipUserNum();
+        map.put("vipNum",vipUserNum);
+        map.put("inlineNum",keys.size());
+        return map;
+    }
+
 
     /**
      * 根据条件分页查询已分配用户角色列表

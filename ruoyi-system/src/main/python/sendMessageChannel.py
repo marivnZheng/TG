@@ -17,11 +17,14 @@ client = TelegramClient(StringSession(mySession), api_id, api_hash,system_versio
 client.connect()
 try:
     channel = client.get_entity(targetUser)
+    if  message == "None":
+        message = ""
     if filePath != "None":
-        client.send_file(channel, filePath, caption=message,parse_mode='html')
+        result = client.send_file(channel,filePath, caption=message,parse_mode='html')
+        print("{"+'"code":"{}","msg":"{}"'.format(200,"发送成功")+"}")
     else:
-        message = client.send_message(channel, message,parse_mode='html')
-    print("{" + '"code":"{}","msg":"{}"'.format(200, "发送成功") + "}")
+        result = client.send_message(channel, message,parse_mode='html')
+        print("{"+'"code":"{}","msg":"{}"'.format(200,"发送成功")+"}")
 except UserDeactivatedBanError as e:
     print("{" + '"code":"{}","msg":"{}"'.format(444, "账号已经封禁") + "}")
 except Exception as e:
