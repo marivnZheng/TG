@@ -32,13 +32,16 @@ public class JoinGroupRunnable implements Runnable {
 
     private TGUtil tgUtil;
 
-    public JoinGroupRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob,TGUtil tgUtil) {
+    private boolean isVip;
+
+    public JoinGroupRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob,TGUtil tgUtil,Boolean isVip) {
         this.parms = parms;
         this.myJobDetail = myJobDetail;
         this.myJobMapper =myJobMapper;
         this.lastFlag=lastFlag;
         this.myJob=myJob;
         this.tgUtil=tgUtil;
+        this.isVip=isVip;
     }
 
     public JoinGroupRunnable() {

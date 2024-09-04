@@ -40,6 +40,8 @@ public interface SysUserMapper
 
     public Long selectVipUserNum();
 
+    public  Long  selectCount();
+
     /**
      * 通过用户名查询用户
      * 

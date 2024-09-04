@@ -2,12 +2,14 @@ package com.ruoyi.system.consumer;
 
 import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson2.JSON;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.domain.MyJob;
 import com.ruoyi.common.domain.MyJobDetail;
 import com.ruoyi.common.mapper.MyJobMapper;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SysTaskMapper;
+import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.util.TGUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,9 @@ public class TgTaskConsumer{
 
         @Autowired
         private MyJobMapper myJobMapper;
+
+        @Autowired
+        private SysUserMapper sysUserMapper;
 
         @Autowired
         private TGUtil tgUtil;
@@ -159,13 +164,15 @@ public class TgTaskConsumer{
 
         public  void exec(String parms,MyJobDetail myJobDetail,MyJob myJob) throws IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException, NoSuchMethodException {
                         Class<?>runnable = Class.forName(myJobDetail.getTaskClass());
-                        Class[] parameterTypes={String.class,MyJobDetail.class, MyJobMapper.class,Boolean.class,MyJob.class,TGUtil.class};
+                        Class[] parameterTypes={String.class,MyJobDetail.class, MyJobMapper.class,Boolean.class,MyJob.class,TGUtil.class,Boolean.class};
                         boolean flag = false;
                         if((myJobDetail.getIndex()+1) % myJob.getTarNum() == 0) {
                                 flag=true;
                         }
+                        SysUser sysUser = sysUserMapper.selectUserById(myJob.getUserId());
+                        boolean isVip = sysUser.getAccountDetailId()>1?true:false;
                         Constructor<?> constructors = runnable.getConstructor(parameterTypes);
-                        Object[] parameters={parms,myJobDetail,myJobMapper,flag,myJob,tgUtil};
+                        Object[] parameters={parms,myJobDetail,myJobMapper,flag,myJob,tgUtil,isVip};
                         Runnable o =(Runnable) constructors.newInstance(parameters);
                         executor.execute(o);
         };

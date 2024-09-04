@@ -33,13 +33,16 @@ public class addContactPhoneRunnable implements Runnable {
 
     private TGUtil tgUtil;
 
-    public addContactPhoneRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob,TGUtil tgUtil) {
+    private boolean isVip;
+
+    public addContactPhoneRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob,TGUtil tgUtil,Boolean isVip) {
         this.parms = parms;
         this.myJobDetail = myJobDetail;
         this.myJobMapper =myJobMapper;
         this.lastFlag=lastFlag;
         this.myJob=myJob;
         this.tgUtil=tgUtil;
+        this.isVip=isVip;
     }
     public addContactPhoneRunnable() {
 

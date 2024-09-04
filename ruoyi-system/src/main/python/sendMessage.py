@@ -1,5 +1,4 @@
 import sys
-
 import socks
 import telethon
 from telethon.errors import UserDeactivatedBanError

@@ -30,13 +30,16 @@ public class sendMessageContactRunnable implements Runnable {
 
     private  TGUtil tgUtil;
 
-    public sendMessageContactRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob,TGUtil tgUtil) {
+    private boolean isVip;
+
+    public sendMessageContactRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob,TGUtil tgUtil,Boolean isVip) {
         this.parms = parms;
         this.myJobDetail = myJobDetail;
         this.myJobMapper =myJobMapper;
         this.lastFlag=lastFlag;
         this.myJob=myJob;
         this.tgUtil=tgUtil;
+        this.isVip=isVip;
     }
     public sendMessageContactRunnable() {
 
@@ -48,7 +51,6 @@ public class sendMessageContactRunnable implements Runnable {
         //进入转发逻辑
         try {
             //获取消息组
-            Boolean isVip = (Boolean) map.get("isVip");
             List<Map> messageGroupList= (List<Map>) map.get("messageGroup");
             Integer sendIndex = (Integer) map.get("sendIndex");
             Map messageGroup = messageGroupList.get(sendIndex);

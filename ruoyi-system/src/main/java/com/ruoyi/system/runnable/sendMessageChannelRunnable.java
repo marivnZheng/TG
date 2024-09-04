@@ -31,13 +31,16 @@ public class sendMessageChannelRunnable implements Runnable {
 
     private TGUtil tgUtil;
 
-    public sendMessageChannelRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob,TGUtil tgUtil) {
+    private boolean isVip;
+
+    public sendMessageChannelRunnable(String parms, MyJobDetail myJobDetail, MyJobMapper myJobMapper,Boolean lastFlag,MyJob myJob,TGUtil tgUtil,Boolean isVip) {
         this.parms = parms;
         this.myJobDetail = myJobDetail;
         this.myJobMapper =myJobMapper;
         this.lastFlag=lastFlag;
         this.myJob=myJob;
         this.tgUtil=tgUtil;
+        this.isVip=isVip;
     }
 
 
@@ -50,7 +53,6 @@ public class sendMessageChannelRunnable implements Runnable {
         String forWordMessage = (String) map.get("forWordMessage");
         try {
             //获取消息组
-            Boolean isVip = (Boolean) map.get("isVip");
             List<Map> messageGroupList= (List<Map>) map.get("messageGroup");
             Integer sendIndex = (Integer) map.get("sendIndex");
             Map messageGroup = messageGroupList.get(sendIndex);

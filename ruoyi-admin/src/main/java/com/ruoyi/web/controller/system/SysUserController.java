@@ -58,8 +58,8 @@ public class SysUserController extends BaseController
      * 获取用户列表
      */
     @PreAuthorize("@ss.hasPermi('system:user:list')")
-    @GetMapping("/list")
-    public TableDataInfo list(SysUser user)
+    @PostMapping("/list")
+    public TableDataInfo list(@RequestBody SysUser user)
     {
         startPage();
         List<SysUser> list = userService.selectUserList(user);
@@ -164,14 +164,6 @@ public class SysUserController extends BaseController
         if (!userService.checkUserNameUnique(user))
         {
             return error("修改用户'" + user.getUserName() + "'失败，登录账号已存在");
-        }
-        else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user))
-        {
-            return error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
-        }
-        else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user))
-        {
-            return error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         user.setUpdateBy(getUsername());
         return toAjax(userService.updateUser(user));

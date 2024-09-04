@@ -104,6 +104,7 @@ public class SysUserServiceImpl implements ISysUserService
         Long vipUserNum = userMapper.selectVipUserNum();
         map.put("vipNum",vipUserNum);
         map.put("inlineNum",keys.size());
+        map.put("total",userMapper.selectCount());
         return map;
     }
 
