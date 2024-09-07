@@ -52,6 +52,16 @@ public class SysGroupController extends BaseController
         return getDataTable(list);
     }
 
+
+    @PreAuthorize("@ss.hasPermi('system:group:list')")
+    @PostMapping("/listGroupManage")
+    public TableDataInfo listGroupManage(@RequestBody SysGroup sysGroup)
+    {
+        startPage();
+        List<SysGroup> list = sysGroupService.selectSysGroupAllList(sysGroup);
+        return getDataTable(list);
+    }
+
     @PreAuthorize("@ss.hasPermi('system:group:list')")
     @PostMapping("/listGroupAll")
     public TableDataInfo listGroupAll(@RequestBody SysGroup sysGroup)

@@ -59,6 +59,26 @@ public class SysGroup extends BaseEntity
 
     private Long sysAccountId;
 
+    private Long participantsCount;
+
+    private Integer isPrivate;
+
+
+    public Long getParticipantsCount() {
+        return participantsCount;
+    }
+
+    public void setParticipantsCount(Long participantsCount) {
+        this.participantsCount = participantsCount;
+    }
+
+    public Integer getIsPrivate() {
+        return isPrivate;
+    }
+
+    public void setIsPrivate(Integer isPrivate) {
+        this.isPrivate = isPrivate;
+    }
 
     public Long getSysAccountId() {
         return sysAccountId;

@@ -28,6 +28,8 @@ public interface ISysGroupService
      */
     public List<SysGroup> selectSysGroupList(SysGroup sysGroup);
 
+    public List<SysGroup> selectSysGroupAllList(SysGroup sysGroup);
+
     /**
      * 新增
      * 

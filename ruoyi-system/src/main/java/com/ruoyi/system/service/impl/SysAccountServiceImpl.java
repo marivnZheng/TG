@@ -181,6 +181,8 @@ public class SysAccountServiceImpl implements ISysAccountService
                             group.setSysGroupTitle((String) map.get("title"));
                             group.setSysGroupId(Long.valueOf((String) map.get("id")));
                             group.setSysGroupDetail(String.valueOf((Boolean)map.get("isGroup")));
+                            group.setIsPrivate(Integer.valueOf((Boolean)map.get("isPrivate")?0:1));
+                            group.setParticipantsCount(Long.valueOf((Integer) map.get("participantsCount")));
                             group.setSysGroupSendMessage(Long.valueOf((Boolean)map.get("sendMessages")?0:1));
                             group.setSysGroupSendPhoto(Long.valueOf((Boolean)map.get("sendPhotos")?0:1));
                             group.setSysGroupInvite(Long.valueOf((Boolean)map.get("inviteUsers")?0:1));

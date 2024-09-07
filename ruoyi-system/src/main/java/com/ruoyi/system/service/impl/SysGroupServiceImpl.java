@@ -70,6 +70,12 @@ public class SysGroupServiceImpl implements ISysGroupService
         sysGroup.setSysUserId(getLoginUser().getUserId());
         return sysGroupMapper.selectSysGroupList(sysGroup);
     }
+    @Override
+    public List<SysGroup> selectSysGroupAllList(SysGroup sysGroup)
+    {
+        sysGroup.setSysUserId(getLoginUser().getUserId());
+        return sysGroupMapper.selectGroupAll(sysGroup);
+    }
 
     /**
      * 新增
@@ -143,6 +149,8 @@ public class SysGroupServiceImpl implements ISysGroupService
                             group.setSysGroupTitle((String) map.get("title"));
                             group.setSysGroupId(Long.valueOf((String) map.get("id")));
                             group.setSysGroupDetail(String.valueOf((Boolean)map.get("isGroup")));
+                            group.setIsPrivate(Integer.valueOf((Boolean)map.get("isPrivate")?0:1));
+                            group.setParticipantsCount(Long.valueOf((Integer) map.get("participantsCount")));
                             group.setSysGroupSendMessage(Long.valueOf((Boolean)map.get("sendMessages")?0:1));
                             group.setSysGroupSendPhoto(Long.valueOf((Boolean)map.get("sendPhotos")?0:1));
                             group.setSysGroupInvite(Long.valueOf((Boolean)map.get("inviteUsers")?0:1));
@@ -344,7 +352,6 @@ public class SysGroupServiceImpl implements ISysGroupService
                         parms.put("sessionString",account.getSysAccountStringSession());
                         parms.put("link",link);
                         tgUtil.GenerateCommand("joinGroup", parms);
-                        Thread.sleep(1000*loopTime*60);
                     } catch (InterruptedException | IOException e) {
                         e.printStackTrace();
                     }

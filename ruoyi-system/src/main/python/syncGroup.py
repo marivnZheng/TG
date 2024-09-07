@@ -28,8 +28,11 @@ for d in client.iter_dialogs():
         sendPhotos = '',
         inviteUsers = '',
         sendMessages = '',
+        participantsCount='',
         id = str(en.id)
         title = en.title
+        isPrivate = not en.access_hash
+        participantsCount=en.participants_count
         if en.admin_rights != 'None':
             rights = en.default_banned_rights
         elif en.default_banned_rights != 'None':
@@ -54,7 +57,7 @@ for d in client.iter_dialogs():
             if public:
                 link = f'{en.username}'
                 print(json.dumps(
-                    myGroup(link, inviteUsers, sendPhotos, sendMessages, is_group, id, title).__dict__).encode('utf-8'))
+                    myGroup(link, inviteUsers, sendPhotos, sendMessages, is_group, id, title,participantsCount,isPrivate).__dict__).encode('utf-8'))
 
             elif admin:
                 if is_chat:
@@ -64,11 +67,11 @@ for d in client.iter_dialogs():
 
                 link = r.full_chat.exported_invite
                 print(json.dumps(
-                    myGroup(link.link, inviteUsers, sendPhotos, sendMessages, is_group, id, title).__dict__).encode('utf-8'))
+                    myGroup(link.link, inviteUsers, sendPhotos, sendMessages, is_group, id, title,participantsCount,isPrivate).__dict__).encode('utf-8'))
 
             else:
                 print(json.dumps(
-                    myGroup(link, inviteUsers, sendPhotos, sendMessages, is_group, id, title).__dict__).encode('utf-8'))
+                    myGroup(link, inviteUsers, sendPhotos, sendMessages, is_group, id, title,participantsCount,isPrivate).__dict__).encode('utf-8'))
     except UserDeactivatedBanError as e:
         print("{" + '"code":"{}","msg":"{}"'.format(444, "账号已经封禁") + "}")
     except Exception as e:

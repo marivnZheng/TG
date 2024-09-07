@@ -31,6 +31,8 @@ public interface SysGroupMapper
      */
     public List<SysGroup> selectSysGroupList(SysGroup sysGroup);
 
+    public List<SysGroup> selectGroupAll(SysGroup sysGroup);
+
     /**
      * 新增
      * 
