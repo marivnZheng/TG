@@ -52,7 +52,13 @@ public class JoinGroupRunnable implements Runnable {
         HashMap map = JSON.parseObject(parms, HashMap.class);
         try {
             map.put("link", StringUtils.isNotEmpty(myJobDetail.getTarg())?myJobDetail.getTarg():myJobDetail.getTargId());
-            String result=tgUtil.GenerateCommand("joinGroup",map);
+            String result= "";
+            if((Boolean)map.get("isPrivate")){
+                result =  tgUtil.GenerateCommand("joinPrivateGroup",map);
+            }else{
+                result =  tgUtil.GenerateCommand("joinGroup",map);
+            }
+
             String s = result.replaceAll("\\\\", "_");
             if(!TGUtil.isJsonString(s)){
                 myJobDetail.setJobDetailDate(DateUtils.getNowDate());

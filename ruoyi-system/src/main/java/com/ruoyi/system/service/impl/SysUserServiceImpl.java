@@ -323,7 +323,8 @@ public class SysUserServiceImpl implements ISysUserService
     public int updateUser(SysUser user)
     {
         Long userId = user.getUserId();
-        user.setRoleId(2L);
+        Long[] roleIds = new Long[] {2L};
+        user.setRoleIds(roleIds);
         // 删除用户与角色关联
         userRoleMapper.deleteUserRoleByUserId(userId);
         // 新增用户与角色管理

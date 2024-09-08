@@ -190,6 +190,13 @@ public class TGUtil {
              cmd.add(appHash);
              cmd.add((String) parms.get("sessionString"));
              cmd.add((String) parms.get("link"));
+        }else if (StringUtils.equals(methodName, "joinPrivateGroup")) {
+            cmd.add(python);
+            cmd.add(getFilePath(methodName));
+            cmd.add(appid);
+            cmd.add(appHash);
+            cmd.add((String) parms.get("sessionString"));
+            cmd.add((String) parms.get("link"));
         } else if (StringUtils.equals(methodName, "syncAccount")) {
              cmd.add(python);
              cmd.add(getFilePath(methodName));
