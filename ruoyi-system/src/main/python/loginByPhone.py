@@ -5,7 +5,6 @@ import socks
 import telethon
 import logging
 import redis
-from sql_insert import insertSysAccount
 from TGHelper import getContactNum, getGroupNumber, initLoginEntity
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession

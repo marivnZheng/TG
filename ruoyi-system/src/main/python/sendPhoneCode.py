@@ -8,6 +8,8 @@ api_id =  sys.argv[1]
 api_hash = sys.argv[2]
 phone = sys.argv[3]
 
+
+
 client = TelegramClient(phone, api_id, api_hash,proxy=(socks.SOCKS5, 'localhost', 4444))
 client.connect()
 if not client.is_user_authorized():

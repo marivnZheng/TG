@@ -82,5 +82,9 @@ public class SysAccount extends BaseEntity
 
     private Long sysAccountLoginStatus;
 
+    private String appId;
+
+    private String appHash;
+
 
 }

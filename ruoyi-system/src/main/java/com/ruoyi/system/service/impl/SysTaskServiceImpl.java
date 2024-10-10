@@ -106,8 +106,9 @@ public class SysTaskServiceImpl implements ISysTaskService
                     parms.put("forWordMessage",map.get("forWordMessage"));
                     parms.put("sendIndex",0);
                     parms.put("endTime",map.get("endTime"));
+                    parms.put("appId",mapAccount.get("appId"));
+                    parms.put("appHash",mapAccount.get("appHash"));
                     parms.put("startTime",map.get("startTime"));
-                    parms.put("endDate",map.get("endDate"));
                     parms.put("endDate",map.get("endDate"));
                     parms.put("isVip",accountDetailId>1?true:false);
                     MyJob myJob = new MyJob();
@@ -163,6 +164,8 @@ public class SysTaskServiceImpl implements ISysTaskService
                     parms.put("isVip",accountDetailId>1?true:false);
                     parms.put("endTime",map.get("endTime"));
                     parms.put("startTime",map.get("startTime"));
+                    parms.put("appId",mapAccount.get("appId"));
+                    parms.put("appHash",mapAccount.get("appHash"));
                     parms.put("endDate",map.get("endDate"));
                     MyJob myJob = new MyJob();
                     myJob.setIntervals(onceMin+"");
@@ -215,6 +218,8 @@ public class SysTaskServiceImpl implements ISysTaskService
                     parms.put("startTime",map.get("startTime"));
                     parms.put("isVip",accountDetailId>1?true:false);
                     parms.put("endDate",map.get("endDate"));
+                    parms.put("appId",mapAccount.get("appId"));
+                    parms.put("appHash",mapAccount.get("appHash"));
                     myJob.setJobName(StringUtils.equals(selectOption,"0")?"发送信息给用户":"发送信息给频道");
                     myJob.setJobType(StringUtils.equals(sendMethod,"1")?"1":"2");
                     myJob.setTarNum(tarNum);
@@ -259,6 +264,8 @@ public class SysTaskServiceImpl implements ISysTaskService
                     parms.put("startTime",map.get("startTime"));
                     parms.put("endDate",map.get("endDate"));
                     parms.put("isVip",accountDetailId>1?true:false);
+                    parms.put("appId",mapAccount.get("appId"));
+                    parms.put("appHash",mapAccount.get("appHash"));
                     MyJob myJob = new MyJob();
                     myJob.setIntervals(minCount.toString());
                     myJob.setIntervalsUnit(Integer.valueOf(min));
@@ -333,6 +340,8 @@ public class SysTaskServiceImpl implements ISysTaskService
                 parms.put("forWordMessage",map.get("forWordMessage"));
                 parms.put("endDate",map.get("endDate"));
                 parms.put("nextPlanDate",map.get("nextPlanDate"));
+                parms.put("appId",account.get("appId"));
+                parms.put("appHash",account.get("appHash"));
                 MyJob myJob = new MyJob();
                 myJob.setIntervals(onceMin+"");
                 myJob.setIntervalsUnit(Integer.valueOf(onceType));
@@ -401,6 +410,8 @@ public class SysTaskServiceImpl implements ISysTaskService
                 parms.put("startTime",map.get("startTime"));
                 parms.put("endDate",map.get("endDate"));
                 parms.put("nextPlanDate",map.get("nextPlanDate"));
+                parms.put("appId",map.get("appId"));
+                parms.put("appHash",map.get("appHash"));
                 job.setTarNum(accountLinkList.size());
                 job.setJobType("1");
                 job.setJobName("发送信息给用户");

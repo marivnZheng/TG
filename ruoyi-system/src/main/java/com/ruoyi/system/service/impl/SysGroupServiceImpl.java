@@ -136,6 +136,8 @@ public class SysGroupServiceImpl implements ISysGroupService
                     Long sysAccountId = e.getSysAccountId();
                     HashMap parms = new HashMap();
                     parms.put("sysAccountStringSession",sysAccountStringSession);
+                    parms.put("appId",e.getAppId());
+                    parms.put("appHash",e.getAppHash());
                     try {
                         log.info("当前账号为：{}，账号为：{}，开始同步群组。",getLoginUser().getUsername(),sysAccountId);
                         sysGroupMapper.deleteSysContactByAccountId(sysAccountId);
@@ -271,6 +273,8 @@ public class SysGroupServiceImpl implements ISysGroupService
                     job.setIntervalsUnit(1);
                     parsm.put("sessionString",account.getSysAccountStringSession());
                     parsm.put("isPrivate",isPrivate);
+                    parsm.put("appId",account.getAppId());
+                    parsm.put("appHash",account.getAppHash());
                     job.setCreateDate(DateUtils.getNowDate());
                     job.setUserId(userId);
                     job.setParms(JSON.toJSONString(parsm));
@@ -323,6 +327,8 @@ public class SysGroupServiceImpl implements ISysGroupService
                     job.setIntervalsUnit(1);
                     parsm.put("isPrivate",isPrivate);
                     parsm.put("sessionString",account.getSysAccountStringSession());
+                    parsm.put("appId",account.getAppId());
+                    parsm.put("appHash",account.getAppHash());
                     job.setCreateDate(DateUtils.getNowDate());
                     job.setUserId(userId);
                     job.setParms(JSON.toJSONString(parsm));
@@ -352,6 +358,8 @@ public class SysGroupServiceImpl implements ISysGroupService
                     HashMap parms = new HashMap();
                     try {
                         parms.put("sessionString",account.getSysAccountStringSession());
+                        parms.put("appId",account.getAppId());
+                        parms.put("appHash",account.getAppHash());
                         parms.put("link",link);
                         if(isPrivate){
                             tgUtil.GenerateCommand("joinPrivateGroup", parms);

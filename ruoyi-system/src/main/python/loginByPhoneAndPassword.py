@@ -6,7 +6,6 @@ import socks
 import telethon
 import logging
 import redis
-from sql_insert import insertSysAccount
 from TGHelper import getContactNum, getGroupNumber, initLoginEntity
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
@@ -36,8 +35,11 @@ if not client.is_user_authorized():
         loginEntity = initLoginEntity(phone, phone, MySession,ContactNum, groupnum,result.username,result.first_name,result.last_name,full.full_user.about)
         result = "{" + '"code":"{}","msg":{}'.format(200, json.dumps(loginEntity.__dict__)) + "}"
         r.set(phone, result)
+        print(result)
         client.run_until_disconnected()
     except Exception as e:
         result = "{"+'"code":"{}","msg":"{}"'.format(400,e)+"}"
+        print(result)
         r.set(phone, result)
+
 

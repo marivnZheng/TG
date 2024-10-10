@@ -113,6 +113,10 @@ pagehelper:
   supportMethodsArguments: true
   params: count=countSql
 
+telegram:
+  appId: 94575
+  appHash: a3406de8d171bb422bb6ddf3bbd800e2
+
 python:
   version: python
 # Swagger配置

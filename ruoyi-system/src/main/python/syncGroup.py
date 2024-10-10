@@ -4,15 +4,17 @@ import socks
 from telethon.tl.types import ChatBannedRights
 from myGroup import myGroup
 import json
+from TGHelper import escapeSpecialCharacters
 from telethon.errors import UserDeactivatedBanError
 from telethon import TelegramClient, sync
 from telethon.sessions import StringSession
 from json import JSONEncoder
 import telethon.tl.functions as _fn
 
-api_id =  sys.argv[1]
+api_id = sys.argv[1]
 api_hash = sys.argv[2]
-sessionPath=sys.argv[3]
+sessionPath = sys.argv[3]
+
 
 json._default_encoder = JSONEncoder(ensure_ascii=False)
 client = TelegramClient(StringSession(sessionPath), api_id, api_hash,system_version="4.16.30-vxCUSTOM",proxy=(socks.SOCKS5, 'localhost', 4444))
@@ -30,7 +32,7 @@ for d in client.iter_dialogs():
         sendMessages = '',
         participantsCount='',
         id = str(en.id)
-        title = en.title
+        title = escapeSpecialCharacters(en.title)
         isPrivate = not en.access_hash
         participantsCount=en.participants_count
         if en.admin_rights != 'None':
@@ -51,8 +53,10 @@ for d in client.iter_dialogs():
         if not d.is_channel or is_chat: continue
         if en.usernames:
             link = f'{en.usernames[0].username}'
+            tmpJson = json.dumps(
+                myGroup(link, inviteUsers, sendPhotos, sendMessages, is_group, id, title,participantsCount,isPrivate).__dict__).encode('utf-8')
             print(json.dumps(
-                myGroup(link, inviteUsers, sendPhotos, sendMessages, is_group, id, title).__dict__).encode('utf-8'))
+                myGroup(link, inviteUsers, sendPhotos, sendMessages, is_group, id, title,participantsCount,isPrivate).__dict__).encode('utf-8'))
         else:
             if public:
                 link = f'{en.username}'

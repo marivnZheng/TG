@@ -51,8 +51,14 @@
     <select id="selectGroupAll" parameterType="SysGroup" resultMap="SysGroupResult">
         select sys_group_id, sys_group_title, sys_group_link, sys_group_detail, sys_group_send_photo, sys_group_send_message, sys_group_invite,sys_group_participants_count from sys_group
         <where>
-            <if test="sysGroupDetail != null "> and sys_group_detail = #{sysGroupDetail}</if>
-            <if test="isPrivate != null"> and sys_group_is_private =#{isPrivate}</if>
+            <if test="sysUserId != null "> and sys_user_id = #{sysUserId}</if>
+            <if test="sysGroupTitle != null"> and sys_group_title like concat('%', #{sysGroupTitle}, '%')</if>
+            <if test="sysGroupLink == 'false'"> and sys_group_link is null</if>
+            <if test="sysGroupLink == 'true'"> and sys_group_link is not null</if>
+            <if test="sysGroupDetail != null"> and sys_group_detail = #{sysGroupDetail}</if>
+            <if test="sysGroupSendPhoto != null "> and sys_group_send_photo = #{sysGroupSendPhoto}</if>
+            <if test="sysGroupSendMessage != null "> and sys_group_send_message = #{sysGroupSendMessage}</if>
+            <if test="sysGroupInvite != null"> and sys_group_invite = #{sysGroupInvite}</if>
         </where>
         GROUP BY sys_group_id, sys_group_title, sys_group_link, sys_group_detail, sys_group_send_photo, sys_group_send_message, sys_group_invite,sys_group_participants_count
     </select>

@@ -18,10 +18,13 @@ public class TgLogin {
 
     private String password;
 
+    private String appId;
+
+    private String appHash;
+
     public TgLogin(String codeHash,String phoneNumber){
         this.codeHash=codeHash;
         this.phoneNumber=phoneNumber;
-
     }
 
     public String getPhoneNumber() {
@@ -54,5 +57,21 @@ public class TgLogin {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public String getAppHash() {
+        return appHash;
+    }
+
+    public void setAppHash(String appHash) {
+        this.appHash = appHash;
     }
 }

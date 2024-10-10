@@ -139,11 +139,10 @@ public class SysAccountServiceImpl implements ISysAccountService
 
 
     @Override
-    public TgLogin sendPhoneCode(String phoneNumber) throws InterruptedException, IOException {
-        HashMap parms = new HashMap();
-        parms.put("phoneNumber",phoneNumber);
-        String sendPhoneCode = tgUtil.GenerateCommand("sendPhoneCode", parms);
-        return new TgLogin(sendPhoneCode,phoneNumber);
+    public TgLogin sendPhoneCode(TgLogin tgLogin) throws InterruptedException, IOException {
+        Map map = JSON.parseObject(JSON.toJSONString(tgLogin), Map.class);
+        String sendPhoneCode = tgUtil.GenerateCommand("sendPhoneCode", (HashMap)map);
+        return new TgLogin(sendPhoneCode,tgLogin.getPhoneNumber());
     }
 
     @Override
@@ -162,12 +161,10 @@ public class SysAccountServiceImpl implements ISysAccountService
         }
         return success();
     }
-    public void syncGroup(String sysAccountStringSession,Long sysAccountId,SysUser user ){
+    public void syncGroup(HashMap parms,Long sysAccountId,SysUser user ){
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                    HashMap parms = new HashMap();
-                    parms.put("sysAccountStringSession",sysAccountStringSession);
                     try {
                         log.info("当前账号为：{}，账号为：{}，开始同步群组。",user.getUserName(),sysAccountId);
                         sysGroupMapper.deleteSysContactByAccountId(sysAccountId);
@@ -187,7 +184,7 @@ public class SysAccountServiceImpl implements ISysAccountService
                             group.setSysGroupSendPhoto(Long.valueOf((Boolean)map.get("sendPhotos")?0:1));
                             group.setSysGroupInvite(Long.valueOf((Boolean)map.get("inviteUsers")?0:1));
                             group.setSysUserId(user.getUserId());
-                            group.setSysAccountStringSession(sysAccountStringSession);
+                            group.setSysAccountStringSession((String) parms.get("sysAccountStringSession"));
                             group.setSysAccountId(sysAccountId);
                             groupList.add(group);
                         }
@@ -201,13 +198,11 @@ public class SysAccountServiceImpl implements ISysAccountService
         executor.execute(runnable);
     }
 
- public void syncContact(String sysAccountStringSession,Long sysAccountId,SysUser user ){
+ public void syncContact(HashMap parms,Long sysAccountId,SysUser user ){
 
      Runnable runnable = new Runnable() {
          @Override
          public void run() {
-                 HashMap parms = new HashMap();
-                 parms.put("sysAccountStringSession", sysAccountStringSession);
                  log.info("当前账号为：{}，账号为：{}，开始同步好友。",user.getUserName(),sysAccountId);
                  sysContactMapper.deleteSysContactByAccountId(sysAccountId);
                  try {
@@ -266,13 +261,18 @@ public class SysAccountServiceImpl implements ISysAccountService
                sysAccount.setSysAccountCreateTime(DateUtils.getNowDate());
                sysAccount.setSysAccountCreateTimezone(ZoneId.systemDefault().toString());
                sysAccount.setSysUserId(getLoginUser().getUserId());
+               sysAccount.setAppHash(tgLogin.getAppHash());
+               sysAccount.setAppId(tgLogin.getAppId());
                sysAccountMapper.insertSysAccount(sysAccount);
                //开启线程同步好友及群聊
 
-               String sessionString=(String)msg.get("sessionString");
+               HashMap parms = new HashMap();
+               parms.put("sysAccountStringSession", (String)msg.get("sessionString"));
+               parms.put("appId",tgLogin.getAppId());
+               parms.put("appHash",tgLogin.getAppHash());
                SysUser user = getLoginUser().getUser();
-               syncContact(sessionString,sysAccount.getSysAccountId(),user);
-               syncGroup(sessionString,sysAccount.getSysAccountId(),user);
+               syncContact(parms,sysAccount.getSysAccountId(),user);
+               syncGroup(parms,sysAccount.getSysAccountId(),user);
 
                return success();
 
@@ -307,11 +307,18 @@ public class SysAccountServiceImpl implements ISysAccountService
                 sysAccount.setSysAccountCreateTime(DateUtils.getNowDate());
                 sysAccount.setSysAccountCreateTimezone(ZoneId.systemDefault().toString());
                 sysAccount.setSysUserId(getLoginUser().getUserId());
+                sysAccount.setAppHash(tgLogin.getAppHash());
+                sysAccount.setAppId(tgLogin.getAppId());
                 sysAccountMapper.insertSysAccount(sysAccount);
+
+                HashMap parms = new HashMap();
+                parms.put("sysAccountStringSession", (String)msg.get("sessionString"));
+                parms.put("appId",tgLogin.getAppId());
+                parms.put("appHash",tgLogin.getAppHash());
                 SysUser user = getLoginUser().getUser();
-                String sessionString=(String)msg.get("sessionString");
-                syncContact(sessionString,sysAccount.getSysAccountId(),user);
-                syncGroup(sessionString,sysAccount.getSysAccountId(),user);
+                syncContact(parms,sysAccount.getSysAccountId(),user);
+                syncGroup(parms,sysAccount.getSysAccountId(),user);
+
                 return success();
             }else{
                 return  new AjaxResult(400,"未知错误");
@@ -367,9 +374,13 @@ public class SysAccountServiceImpl implements ISysAccountService
     @Override
     public AjaxResult syncAccount(List<SysAccount> list) throws InterruptedException, IOException {
         for (SysAccount sysAccount : list) {
-                HashMap parms = new HashMap();
-                parms.put("sessionString",sysAccount.getSysAccountStringSession());
-                String loginBySessionFile=  tgUtil.GenerateCommand("syncAccount", parms);
+            HashMap parms = new HashMap();
+            parms.put("sysAccountStringSession",sysAccount.getSysAccountStringSession());
+            parms.put("appId",sysAccount.getAppId());
+            parms.put("appHash",sysAccount.getAppHash());
+            SysUser user = getLoginUser().getUser();
+
+            String loginBySessionFile=  tgUtil.GenerateCommand("syncAccount", parms);
                 String substring = loginBySessionFile.substring(loginBySessionFile.indexOf("{"), loginBySessionFile.indexOf("}")+1);
                 Map map = JSON.parseObject(tgUtil.decodeJson(substring), Map.class);
                 if(map.containsKey("code")&&StringUtils.equals(map.get("code").toString(),"444")){
@@ -393,9 +404,9 @@ public class SysAccountServiceImpl implements ISysAccountService
                 sysAccount.setSysAccountLastName((String)map.get("lastname"));
                 sysAccount.setSysAccountAbout((String)map.get("about"));
                 sysAccountMapper.updateSysAccount(sysAccount);
-                String sessionString=(String)map.get("sessionString");
-                syncContact(sessionString,sysAccount.getSysAccountId(),getLoginUser().getUser());
-                syncGroup(sessionString,sysAccount.getSysAccountId(),getLoginUser().getUser());
+                syncContact(parms,sysAccount.getSysAccountId(),user);
+                syncGroup(parms,sysAccount.getSysAccountId(),user);
+
         }
 
          return success();

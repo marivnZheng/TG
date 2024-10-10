@@ -65,7 +65,7 @@ public interface ISysAccountService
 
 
 
-    public TgLogin sendPhoneCode(String phoneNumber) throws InterruptedException, IOException;
+    public TgLogin sendPhoneCode(TgLogin tgLogin) throws InterruptedException, IOException;
 
 
     public AjaxResult checkPhoneAndUserJurisdiction(String phoneNumber);

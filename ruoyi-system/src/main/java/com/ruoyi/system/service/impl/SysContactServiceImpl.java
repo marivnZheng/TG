@@ -62,6 +62,8 @@ public class SysContactServiceImpl implements ISysContactService {
                     String sysAccountStringSession = e.getSysAccountStringSession();
                     HashMap parms = new HashMap();
                     parms.put("sysAccountStringSession", sysAccountStringSession);
+                    parms.put("appId",e.getAppId());
+                    parms.put("appHash",e.getAppHash());
                     log.info("当前账号为：{}，账号为：{}，开始同步好友。",getLoginUser().getUsername(),e.getSysAccountId());
                     sysContactMapper.deleteSysContactByAccountId(e.getSysAccountId());
                     try {
@@ -135,6 +137,8 @@ public class SysContactServiceImpl implements ISysContactService {
             for (SysAccount sysAccount : sysAccounts) {
                 HashMap parms = new HashMap();
                 parms.put("sessionPath", sysAccount.getSysAccountStringSession());
+                parms.put("appId",sysAccount.getAppId());
+                parms.put("appHash",sysAccount.getAppHash());
                 MyJob job = new MyJob();
                 job.setTarNum(list.size());
                 job.setJobType("1");
@@ -174,6 +178,8 @@ public class SysContactServiceImpl implements ISysContactService {
             for (SysAccount sysAccount : sysAccounts) {
                 HashMap parms = new HashMap();
                 parms.put("sessionPath", sysAccount.getSysAccountStringSession());
+                parms.put("appId",sysAccount.getAppId());
+                parms.put("appHash",sysAccount.getAppHash());
                 parms.put("userName", s1);
                 String result = tgUtil.GenerateCommand("addContact", parms);
                 Map map = JSON.parseObject(result, Map.class);
@@ -223,6 +229,8 @@ public class SysContactServiceImpl implements ISysContactService {
             for (SysAccount sysAccount : sysAccounts) {
                 HashMap parms = new HashMap();
                 parms.put("sessionPath", sysAccount.getSysAccountStringSession());
+                parms.put("appId",sysAccount.getAppId());
+                parms.put("appHash",sysAccount.getAppHash());
                 MyJob job = new MyJob();
                 job.setTarNum(list.size());
                 job.setJobType("1");
@@ -264,6 +272,8 @@ public class SysContactServiceImpl implements ISysContactService {
                 for (SysAccount sysAccount : sysAccounts) {
                     HashMap parms = new HashMap();
                     parms.put("sessionPath", sysAccount.getSysAccountStringSession());
+                    parms.put("appId",sysAccount.getAppId());
+                    parms.put("appHash",sysAccount.getAppHash());
                     parms.put("userName", s1);
                     String result = tgUtil.GenerateCommand("addContact", parms);
                     Map map = JSON.parseObject(result, Map.class);

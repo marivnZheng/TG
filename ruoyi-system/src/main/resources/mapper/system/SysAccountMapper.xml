@@ -20,10 +20,12 @@
         <result property="sysAccountAbout"    column="sys_account_about"    />
         <result property="sysAccountOnline"    column="sys_account_Online"    />
         <result property="sysAccountLoginStatus"    column="sys_account_login_status"    />
+        <result property="appId"    column="sys_account_app_id"    />
+        <result property="appHash"    column="sys_account_app_hash"    />
     </resultMap>
 
     <sql id="selectSysAccountVo">
-        select sys_account_id, sys_user_id, sys_account_name, sys_account_phone, sys_account_session_file, sys_account_string_session, sys_account_concats_number, sys_account_group_number, sys_account_create_time, sys_account_create_timeZone,sys_account_last_name,sys_account_first_name,sys_account_about,sys_account_online,sys_account_login_status from sys_account
+        select sys_account_id, sys_user_id, sys_account_name, sys_account_phone, sys_account_session_file, sys_account_string_session, sys_account_concats_number, sys_account_group_number, sys_account_create_time, sys_account_create_timeZone,sys_account_last_name,sys_account_first_name,sys_account_about,sys_account_online,sys_account_login_status,sys_account_app_id,sys_account_app_hash from sys_account
     </sql>
 
     <select id="selectSysAccountList" parameterType="SysAccount" resultMap="SysAccountResult">
@@ -78,6 +80,8 @@
             <if test="sysAccountCreateTimezone != null">sys_account_create_timeZone,</if>
             <if test="sysAccountFirstName != null">sys_account_first_name,</if>
             <if test="sysAccountLastName != null">sys_account_last_name,</if>
+            <if test="appId != null">sys_account_app_id,</if>
+            <if test="appHash != null">sys_account_app_hash,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="sysUserId != null">#{sysUserId},</if>
@@ -91,6 +95,8 @@
             <if test="sysAccountCreateTimezone != null">#{sysAccountCreateTimezone},</if>
             <if test="sysAccountFirstName != null">#{sysAccountFirstName},</if>
             <if test="sysAccountLastName != null">#{sysAccountLastName},</if>
+            <if test="appId != null">#{appId},</if>
+            <if test="appHash != null">#{appHash},</if>
         </trim>
     </insert>
 

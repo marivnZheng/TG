@@ -9,6 +9,16 @@ from loginEntity import loginEntity
 
 
 
+def escapeSpecialCharacters(original_string):
+    # 使用转义字符
+    escaped_string = original_string.replace("\\", "")  # 转义反斜杠
+    escaped_string = escaped_string.replace("\"", "")  # 转义双引号
+    escaped_string = escaped_string.replace("'", "")     # 转义单引号
+    escaped_string = escaped_string.replace("\n", "")    # 转义换行符
+    escaped_string = escaped_string.replace("\t", "")    # 转义制表符
+    escaped_string = escaped_string.replace("{", "")  # 转义制表符
+    escaped_string = escaped_string.replace("}", "")  # 转义制表符
+    return escaped_string
 
 
 def loginByPhoneNumberAndPassWord(api_id,api_hash,phone,code,codeHash,password):

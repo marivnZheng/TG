@@ -69,9 +69,9 @@ public class SysAccountController extends BaseController
      * 发送验证码
      */
     @PreAuthorize("@ss.hasPermi('system:account:query')")
-    @GetMapping(value = "sendPhoneCode/{phoneNumber}")
-    public AjaxResult getPhoneCode(@PathVariable("phoneNumber") String phoneNumber) throws InterruptedException, IOException {
-        return success(sysAccountService.sendPhoneCode(phoneNumber));
+    @PostMapping("/sendPhoneCode")
+    public AjaxResult getPhoneCode(@RequestBody TgLogin tgLogin) throws InterruptedException, IOException {
+        return success(sysAccountService.sendPhoneCode(tgLogin));
     }
 
 
