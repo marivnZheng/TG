@@ -68,9 +68,15 @@ public interface ISysAccountService
     public TgLogin sendPhoneCode(TgLogin tgLogin) throws InterruptedException, IOException;
 
 
+    public TgLogin sendPhoneCodeChorme(TgLogin tgLogin) throws InterruptedException, IOException;
+
+
+
     public AjaxResult checkPhoneAndUserJurisdiction(String phoneNumber);
 
     public AjaxResult loginAccountByPhoneCode(TgLogin tgLogin) throws InterruptedException, IOException;
+
+    public AjaxResult loginAccountByPhoneCodeChrome(TgLogin tgLogin) throws InterruptedException, IOException;
 
     public AjaxResult sessionFileUpload(MultipartFile file) throws InterruptedException, IOException;
 

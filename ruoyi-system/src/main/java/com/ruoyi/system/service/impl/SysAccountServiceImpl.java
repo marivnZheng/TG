@@ -1,36 +1,32 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.ruoyi.common.constant.HttpStatus;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.system.domain.SysAccount;
-import com.ruoyi.system.domain.SysAccountDetail;
-import com.ruoyi.system.domain.SysContact;
-import com.ruoyi.system.domain.SysGroup;
+import com.ruoyi.system.domain.*;
 import com.ruoyi.system.dto.TgLogin;
 import com.ruoyi.system.mapper.SysAccountMapper;
+import com.ruoyi.system.mapper.SysChromeUserMapper;
 import com.ruoyi.system.mapper.SysContactMapper;
 import com.ruoyi.system.mapper.SysGroupMapper;
 import com.ruoyi.system.service.ISysAccountDetailService;
 import com.ruoyi.system.service.ISysAccountService;
+import com.ruoyi.system.util.ChromeUtil;
 import com.ruoyi.system.util.TGUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.python.antlr.ast.Str;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.lang.reflect.Parameter;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -65,6 +61,12 @@ public class SysAccountServiceImpl implements ISysAccountService
 
     @Autowired
     private SysGroupMapper sysGroupMapper;
+
+    @Autowired
+    private ChromeUtil chromeUtil;
+
+    @Autowired
+    private SysChromeUserMapper sysChromeUserMapper;
 
     private ExecutorService executor = Executors.newCachedThreadPool() ;
 
@@ -143,6 +145,30 @@ public class SysAccountServiceImpl implements ISysAccountService
         Map map = JSON.parseObject(JSON.toJSONString(tgLogin), Map.class);
         String sendPhoneCode = tgUtil.GenerateCommand("sendPhoneCode", (HashMap)map);
         return new TgLogin(sendPhoneCode,tgLogin.getPhoneNumber());
+    }
+
+
+    @Override
+    public TgLogin sendPhoneCodeChorme(TgLogin tgLogin) {
+        try {
+            WebDriver driver = (WebDriver) chromeUtil.getChromeQueue().poll();
+            WebElement phoneNumberLogin = chromeUtil.findElmentByXpath(driver,"//*[@id=\"auth-qr-form\"]/div/button[1]");
+            phoneNumberLogin.click();
+            WebElement sendPhoneCodeInput = chromeUtil.findElmentByXpath(driver,"//*[@id=\"sign-in-phone-number\"]");
+            sendPhoneCodeInput.clear();
+            sendPhoneCodeInput.sendKeys("+ ");
+            sendPhoneCodeInput.sendKeys(StringUtils.substring(tgLogin.getPhoneNumber(),0,tgLogin.getPhoneNumber().length()-1));
+            sendPhoneCodeInput.sendKeys(StringUtils.substring(tgLogin.getPhoneNumber(),tgLogin.getPhoneNumber().length()-1,tgLogin.getPhoneNumber().length()));
+            WebElement sendCode = chromeUtil.findElmentByXpath(driver,"//*[@id=\"auth-phone-number-form\"]/div/form/button[1]/div");
+            sendCode.click();
+            WebElement codeNumber = chromeUtil.findElmentByXpath(driver,"//*[@id=\"sign-in-code\"]");
+            chromeUtil.getChromeMap().put(tgLogin.getPhoneNumber(),driver);
+            return new TgLogin(codeNumber.getText());
+        }catch (Exception e){
+            log.info(e.getMessage());
+            return new TgLogin();
+        }
+
     }
 
     @Override
@@ -328,6 +354,23 @@ public class SysAccountServiceImpl implements ISysAccountService
         }
     }
 
+
+
+    @Override
+    public AjaxResult loginAccountByPhoneCodeChrome(TgLogin tgLogin) {
+      try {
+          WebDriver driver = chromeUtil.getChromeMap().get(tgLogin.getPhoneNumber());
+          WebElement signCode = chromeUtil.findElmentByXpath(driver, "//*[@id=\"sign-in-code\"]");
+          signCode.sendKeys(tgLogin.getCodeNumber());
+          WebElement LeftMainHeader = chromeUtil.findElmentByXpath(driver, "//*[@id=\"LeftMainHeader\"]/div[1]/button/div[2]",10);
+          //登录成功保存登录用户的数据
+          SysChromeUser chromeUser = chromeUtil.getChromeLocalSession(driver);
+          return success(sysChromeUserMapper.insertSysChromeUser(chromeUser));
+      }catch (Exception e){
+          log.error(e.getMessage());
+          return error(e.getMessage());
+      }
+    }
     @Override
     public AjaxResult sessionFileUpload(MultipartFile file)  {
         OutputStream os = null;

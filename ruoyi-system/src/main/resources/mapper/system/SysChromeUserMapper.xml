@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysChromeUserMapper">
+    
+    <resultMap type="SysChromeUser" id="SysChromeUserResult">
+        <result property="userId"    column="user_id"    />
+        <result property="phoneNumber"    column="phone_number"    />
+        <result property="dc"    column="dc"    />
+        <result property="dc1AuthKey"    column="dc1_auth_key"    />
+        <result property="dc1Hash"    column="dc1_hash"    />
+        <result property="dc2AuthKey"    column="dc2_auth_key"    />
+        <result property="dc2Hash"    column="dc2_hash"    />
+        <result property="dc4AuthKey"    column="dc4_auth_key"    />
+        <result property="dc4Hash"    column="dc4_hash"    />
+        <result property="dc5AuthKey"    column="dc5_auth_key"    />
+        <result property="dc5Hash"    column="dc5_hash"    />
+        <result property="tgmeSync"    column="tgme_sync"    />
+        <result property="ttActiveTab"    column="tt_active_tab"    />
+        <result property="ttMultiTab"    column="tt_multi_tab"    />
+        <result property="userAuth"    column="user_auth"    />
+    </resultMap>
+
+    <sql id="selectSysChromeUserVo">
+        select user_id, phone_number,dc, dc1_auth_key, dc1_hash, dc2_auth_key, dc2_hash, dc4_auth_key, dc4_hash, dc5_auth_key, dc5_hash, tgme_sync, tt_active_tab, tt_multi_tab, user_auth from sys_chrome_user
+    </sql>
+
+    <select id="selectSysChromeUserList" parameterType="SysChromeUser" resultMap="SysChromeUserResult">
+        <include refid="selectSysChromeUserVo"/>
+        <where>  
+            <if test="phoneNumber != null  and phoneNumber != ''"> and phone_number = #{phoneNumber}</if>
+            <if test="dc1AuthKey != null  and dc1AuthKey != ''"> and dc1_auth_key = #{dc1AuthKey}</if>
+            <if test="dc1Hash != null  and dc1Hash != ''"> and dc1_hash = #{dc1Hash}</if>
+            <if test="dc2AuthKey != null  and dc2AuthKey != ''"> and dc2_auth_key = #{dc2AuthKey}</if>
+            <if test="dc2Hash != null  and dc2Hash != ''"> and dc2_hash = #{dc2Hash}</if>
+            <if test="dc4AuthKey != null  and dc4AuthKey != ''"> and dc4_auth_key = #{dc4AuthKey}</if>
+            <if test="dc4Hash != null  and dc4Hash != ''"> and dc4_hash = #{dc4Hash}</if>
+            <if test="dc5AuthKey != null  and dc5AuthKey != ''"> and dc5_auth_key = #{dc5AuthKey}</if>
+            <if test="dc5Hash != null  and dc5Hash != ''"> and dc5_hash = #{dc5Hash}</if>
+            <if test="tgmeSync != null  and tgmeSync != ''"> and tgme_sync = #{tgmeSync}</if>
+            <if test="ttActiveTab != null  and ttActiveTab != ''"> and tt_active_tab = #{ttActiveTab}</if>
+            <if test="ttMultiTab != null  and ttMultiTab != ''"> and tt_multi_tab = #{ttMultiTab}</if>
+            <if test="userAuth != null  and userAuth != ''"> and user_auth = #{userAuth}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysChromeUserByUserId" parameterType="Long" resultMap="SysChromeUserResult">
+        <include refid="selectSysChromeUserVo"/>
+        where user_id = #{userId}
+    </select>
+        
+    <insert id="insertSysChromeUser" parameterType="SysChromeUser" useGeneratedKeys="true" keyProperty="userId">
+        insert into sys_chrome_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="phoneNumber != null">phone_number,</if>
+            <if test="dc1AuthKey != null">dc1_auth_key,</if>
+            <if test="dc1Hash != null">dc1_hash,</if>
+            <if test="dc2AuthKey != null">dc2_auth_key,</if>
+            <if test="dc2Hash != null">dc2_hash,</if>
+            <if test="dc4AuthKey != null">dc4_auth_key,</if>
+            <if test="dc4Hash != null">dc4_hash,</if>
+            <if test="dc5AuthKey != null">dc5_auth_key,</if>
+            <if test="dc5Hash != null">dc5_hash,</if>
+            <if test="tgmeSync != null">tgme_sync,</if>
+            <if test="ttActiveTab != null">tt_active_tab,</if>
+            <if test="ttMultiTab != null">tt_multi_tab,</if>
+            <if test="userAuth != null">user_auth,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="phoneNumber != null">#{phoneNumber},</if>
+            <if test="dc1AuthKey != null">#{dc1AuthKey},</if>
+            <if test="dc1Hash != null">#{dc1Hash},</if>
+            <if test="dc2AuthKey != null">#{dc2AuthKey},</if>
+            <if test="dc2Hash != null">#{dc2Hash},</if>
+            <if test="dc4AuthKey != null">#{dc4AuthKey},</if>
+            <if test="dc4Hash != null">#{dc4Hash},</if>
+            <if test="dc5AuthKey != null">#{dc5AuthKey},</if>
+            <if test="dc5Hash != null">#{dc5Hash},</if>
+            <if test="tgmeSync != null">#{tgmeSync},</if>
+            <if test="ttActiveTab != null">#{ttActiveTab},</if>
+            <if test="ttMultiTab != null">#{ttMultiTab},</if>
+            <if test="userAuth != null">#{userAuth},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysChromeUser" parameterType="SysChromeUser">
+        update sys_chrome_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="phoneNumber != null">phone_number = #{phoneNumber},</if>
+            <if test="dc1AuthKey != null">dc1_auth_key = #{dc1AuthKey},</if>
+            <if test="dc1Hash != null">dc1_hash = #{dc1Hash},</if>
+            <if test="dc2AuthKey != null">dc2_auth_key = #{dc2AuthKey},</if>
+            <if test="dc2Hash != null">dc2_hash = #{dc2Hash},</if>
+            <if test="dc4AuthKey != null">dc4_auth_key = #{dc4AuthKey},</if>
+            <if test="dc4Hash != null">dc4_hash = #{dc4Hash},</if>
+            <if test="dc5AuthKey != null">dc5_auth_key = #{dc5AuthKey},</if>
+            <if test="dc5Hash != null">dc5_hash = #{dc5Hash},</if>
+            <if test="tgmeSync != null">tgme_sync = #{tgmeSync},</if>
+            <if test="ttActiveTab != null">tt_active_tab = #{ttActiveTab},</if>
+            <if test="ttMultiTab != null">tt_multi_tab = #{ttMultiTab},</if>
+            <if test="userAuth != null">user_auth = #{userAuth},</if>
+        </trim>
+        where user_id = #{userId}
+    </update>
+
+    <delete id="deleteSysChromeUserByUserId" parameterType="Long">
+        delete from sys_chrome_user where user_id = #{userId}
+    </delete>
+
+    <delete id="deleteSysChromeUserByUserIds" parameterType="String">
+        delete from sys_chrome_user where user_id in 
+        <foreach item="userId" collection="array" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+</mapper>

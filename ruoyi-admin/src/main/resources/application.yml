@@ -16,7 +16,7 @@ ruoyi:
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8080
-  port: 8080
+  port: 8081
   servlet:
     # 应用的访问路径
     context-path: /
@@ -116,6 +116,7 @@ pagehelper:
 telegram:
   appId: 94575
   appHash: a3406de8d171bb422bb6ddf3bbd800e2
+  ChromeDriverPath: C:/Users/Administrator/Desktop/chromedriver-win64/chromedriver-win64/chromedriver.exe
 
 python:
   version: python

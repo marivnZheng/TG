@@ -27,6 +27,10 @@ public class TgLogin {
         this.phoneNumber=phoneNumber;
     }
 
+    public TgLogin(String phoneNumber){
+        this.phoneNumber=phoneNumber;
+    }
+
     public String getPhoneNumber() {
         return phoneNumber;
     }
