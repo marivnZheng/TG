@@ -74,15 +74,6 @@ public class SysAccountController extends BaseController
         return success(sysAccountService.sendPhoneCode(tgLogin));
     }
 
-    /**
-     * 发送验证码  模拟浏览器
-     */
-    @PreAuthorize("@ss.hasPermi('system:account:query')")
-    @PostMapping("/sendPhoneCodeChorme")
-    public AjaxResult sendPhoneCodeChorme(@RequestBody TgLogin tgLogin) throws InterruptedException, IOException {
-        return success(sysAccountService.sendPhoneCodeChorme(tgLogin));
-    }
-
 
 
 
@@ -106,12 +97,6 @@ public class SysAccountController extends BaseController
         return ajaxResult;
     }
 
-    @PreAuthorize("@ss.hasPermi('system:account:query')")
-    @PostMapping(value = "loginAccountByPhoneCodeChrome")
-    public AjaxResult loginAccountByPhoneCodeChrome(@RequestBody TgLogin tgLogin) throws InterruptedException, IOException {
-        AjaxResult ajaxResult = sysAccountService.loginAccountByPhoneCodeChrome(tgLogin);
-        return ajaxResult;
-    }
 
 
 

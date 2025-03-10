@@ -15,17 +15,16 @@ import com.ruoyi.system.mapper.SysAccountMapper;
 import com.ruoyi.system.mapper.SysChromeUserMapper;
 import com.ruoyi.system.mapper.SysContactMapper;
 import com.ruoyi.system.mapper.SysGroupMapper;
+import com.ruoyi.system.properties.TgProperties;
 import com.ruoyi.system.service.ISysAccountDetailService;
 import com.ruoyi.system.service.ISysAccountService;
-import com.ruoyi.system.util.ChromeUtil;
 import com.ruoyi.system.util.TGUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.*;
 import java.time.ZoneId;
 import java.util.*;
@@ -62,8 +61,9 @@ public class SysAccountServiceImpl implements ISysAccountService
     @Autowired
     private SysGroupMapper sysGroupMapper;
 
-    @Autowired
-    private ChromeUtil chromeUtil;
+    @Resource
+    private TgProperties tgProperties;
+
 
     @Autowired
     private SysChromeUserMapper sysChromeUserMapper;
@@ -148,28 +148,6 @@ public class SysAccountServiceImpl implements ISysAccountService
     }
 
 
-    @Override
-    public TgLogin sendPhoneCodeChorme(TgLogin tgLogin) {
-        try {
-            WebDriver driver = (WebDriver) chromeUtil.getChromeQueue().poll();
-            WebElement phoneNumberLogin = chromeUtil.findElmentByXpath(driver,"//*[@id=\"auth-qr-form\"]/div/button[1]");
-            phoneNumberLogin.click();
-            WebElement sendPhoneCodeInput = chromeUtil.findElmentByXpath(driver,"//*[@id=\"sign-in-phone-number\"]");
-            sendPhoneCodeInput.clear();
-            sendPhoneCodeInput.sendKeys("+ ");
-            sendPhoneCodeInput.sendKeys(StringUtils.substring(tgLogin.getPhoneNumber(),0,tgLogin.getPhoneNumber().length()-1));
-            sendPhoneCodeInput.sendKeys(StringUtils.substring(tgLogin.getPhoneNumber(),tgLogin.getPhoneNumber().length()-1,tgLogin.getPhoneNumber().length()));
-            WebElement sendCode = chromeUtil.findElmentByXpath(driver,"//*[@id=\"auth-phone-number-form\"]/div/form/button[1]/div");
-            sendCode.click();
-            WebElement codeNumber = chromeUtil.findElmentByXpath(driver,"//*[@id=\"sign-in-code\"]");
-            chromeUtil.getChromeMap().put(tgLogin.getPhoneNumber(),driver);
-            return new TgLogin(codeNumber.getText());
-        }catch (Exception e){
-            log.info(e.getMessage());
-            return new TgLogin();
-        }
-
-    }
 
     @Override
     public AjaxResult checkPhoneAndUserJurisdiction(String phoneNumber) {
@@ -287,7 +265,8 @@ public class SysAccountServiceImpl implements ISysAccountService
                sysAccount.setSysAccountCreateTime(DateUtils.getNowDate());
                sysAccount.setSysAccountCreateTimezone(ZoneId.systemDefault().toString());
                sysAccount.setSysUserId(getLoginUser().getUserId());
-               sysAccount.setAppHash(tgLogin.getAppHash());
+               sysAccount.setAppHash(tgProperties.getAppHash());
+               sysAccount.setAppId(tgProperties.getAppId());
                sysAccount.setAppId(tgLogin.getAppId());
                sysAccountMapper.insertSysAccount(sysAccount);
                //开启线程同步好友及群聊
@@ -333,8 +312,8 @@ public class SysAccountServiceImpl implements ISysAccountService
                 sysAccount.setSysAccountCreateTime(DateUtils.getNowDate());
                 sysAccount.setSysAccountCreateTimezone(ZoneId.systemDefault().toString());
                 sysAccount.setSysUserId(getLoginUser().getUserId());
-                sysAccount.setAppHash(tgLogin.getAppHash());
-                sysAccount.setAppId(tgLogin.getAppId());
+                sysAccount.setAppHash(tgProperties.getAppHash());
+                sysAccount.setAppId(tgProperties.getAppId());
                 sysAccountMapper.insertSysAccount(sysAccount);
 
                 HashMap parms = new HashMap();
@@ -354,23 +333,6 @@ public class SysAccountServiceImpl implements ISysAccountService
         }
     }
 
-
-
-    @Override
-    public AjaxResult loginAccountByPhoneCodeChrome(TgLogin tgLogin) {
-      try {
-          WebDriver driver = chromeUtil.getChromeMap().get(tgLogin.getPhoneNumber());
-          WebElement signCode = chromeUtil.findElmentByXpath(driver, "//*[@id=\"sign-in-code\"]");
-          signCode.sendKeys(tgLogin.getCodeNumber());
-          WebElement LeftMainHeader = chromeUtil.findElmentByXpath(driver, "//*[@id=\"LeftMainHeader\"]/div[1]/button/div[2]",10);
-          //登录成功保存登录用户的数据
-          SysChromeUser chromeUser = chromeUtil.getChromeLocalSession(driver);
-          return success(sysChromeUserMapper.insertSysChromeUser(chromeUser));
-      }catch (Exception e){
-          log.error(e.getMessage());
-          return error(e.getMessage());
-      }
-    }
     @Override
     public AjaxResult sessionFileUpload(MultipartFile file)  {
         OutputStream os = null;
@@ -491,6 +453,8 @@ public class SysAccountServiceImpl implements ISysAccountService
                 sysAccount.setSysUserId(getLoginUser().getUserId());
                 sysAccount.setSysAccountFirstName((String)res.get("firstname"));
                 sysAccount.setSysAccountLastName((String)res.get("lastname"));
+                sysAccount.setAppHash(tgProperties.getAppHash());
+                sysAccount.setAppId(tgProperties.getAppId());
                 sysAccountMapper.insertSysAccount(sysAccount);
             }else if(loginEntity.get("code").equals("304")){
                 return new AjaxResult(304,"文件已经失效");

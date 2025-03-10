@@ -247,7 +247,6 @@ public class SysGroupServiceImpl implements ISysGroupService
         List<String> accountList = (List<String>) map.get("accountList");
         String groupLink = (String) map.get("groupLink");
         Integer onceTime =Integer.valueOf((String)map.get("onceTime"));
-        Boolean isPrivate = Boolean.valueOf(map.get("isPrivate").toString());
         String addMethod = (String) map.get("addMethod");
         List<SysAccount> sysAccounts = sysAccountMapper.selectByStrings(accountList);
         int index =0;
@@ -272,7 +271,6 @@ public class SysGroupServiceImpl implements ISysGroupService
                     job.setIntervals(onceTime+"");
                     job.setIntervalsUnit(1);
                     parsm.put("sessionString",account.getSysAccountStringSession());
-                    parsm.put("isPrivate",isPrivate);
                     parsm.put("appId",account.getAppId());
                     parsm.put("appHash",account.getAppHash());
                     job.setCreateDate(DateUtils.getNowDate());
@@ -325,7 +323,6 @@ public class SysGroupServiceImpl implements ISysGroupService
                     job.setJobName("群链接添加群组");
                     job.setIntervals(onceTime+"");
                     job.setIntervalsUnit(1);
-                    parsm.put("isPrivate",isPrivate);
                     parsm.put("sessionString",account.getSysAccountStringSession());
                     parsm.put("appId",account.getAppId());
                     parsm.put("appHash",account.getAppHash());
@@ -361,12 +358,7 @@ public class SysGroupServiceImpl implements ISysGroupService
                         parms.put("appId",account.getAppId());
                         parms.put("appHash",account.getAppHash());
                         parms.put("link",link);
-                        if(isPrivate){
-                            tgUtil.GenerateCommand("joinPrivateGroup", parms);
-                        }else{
-                            tgUtil.GenerateCommand("joinGroup", parms);
-                        }
-
+                        tgUtil.GenerateCommand("joinGroup", parms);
                     } catch (InterruptedException | IOException e) {
                         e.printStackTrace();
                     }

@@ -13,6 +13,10 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "telegram")
 public class TgProperties {
-    private String ChromeDriverPath;
+    private  String appId ;
+
+    private  String appHash ;
+
+    private String python;
 
 }

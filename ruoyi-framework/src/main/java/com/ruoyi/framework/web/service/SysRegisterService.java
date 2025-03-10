@@ -5,7 +5,6 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.exception.user.CaptchaException;
@@ -15,7 +14,6 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.manager.AsyncManager;
 import com.ruoyi.framework.manager.factory.AsyncFactory;
-import com.ruoyi.framework.util.MailUtil;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
@@ -45,10 +43,6 @@ public class SysRegisterService
 
     @Autowired
     private ISysRoleService sysRoleService;
-
-    @Autowired
-    private  MailUtil mailUtil;
-
 
     /**
      * 注册
@@ -105,9 +99,7 @@ public class SysRegisterService
         return msg;
     }
 
-    public AjaxResult sendMailGetCode(RegisterBody registerBody){
-        return mailUtil.sendMailGetCode(registerBody.getEmail());
-    }
+
 
     public AjaxResult getCurrentUser(){
         SysUser user = getLoginUser().getUser();
